@@ -27,6 +27,20 @@ export default function DataMappingPage() {
         </section>
 
         <section>
+          <h2 className="mb-1 text-sm font-semibold text-ink/80">
+            교육혁신처 실적 입력 (대학 4개 학과·신대원·대학원 소속별)
+          </h2>
+          <p className="mb-3 text-xs text-muted">
+            교육혁신처는 실적을 소속(신학과·기독교교육과·교회음악학과·자유전공·신대원·대학원)별로
+            나누어 입력합니다. 대학혁신지원사업은 학부교육 대상 사업이므로{" "}
+            <span className="font-medium text-gold">대학(학부) 합계만</span> 골라 쓰고,
+            장기발전계획·대학기관평가인증에는 신대원·대학원을 포함한 전체 합계가 쓰입니다. 아래
+            값을 직접 바꿔보면 오른쪽 합계가 바로 바뀝니다.
+          </p>
+          <DivisionBreakdownTable />
+        </section>
+
+        <section>
           <h2 className="mb-3 text-sm font-semibold text-ink/80">연계 흐름도</h2>
           <DataFlowDiagram />
         </section>
@@ -37,17 +51,6 @@ export default function DataMappingPage() {
             종 전체)
           </h2>
           <DataMappingTable />
-        </section>
-
-        <section>
-          <h2 className="mb-1 text-sm font-semibold text-ink/80">소속별(대학·신대원·대학원) 실적 분포</h2>
-          <p className="mb-3 text-xs text-muted">
-            교육혁신처 실적은 대학(신학과·기독교교육과·교회음악학과)·신대원·대학원 소속별로
-            구분되어 관리됩니다. 대학혁신지원사업은 학부교육 대상 사업이므로{" "}
-            <span className="font-medium text-gold">대학(학부) 합계만</span> 반영되고,
-            장기발전계획·대학기관평가인증에는 신대원·대학원을 포함한 전체 합계가 반영됩니다.
-          </p>
-          <DivisionBreakdownTable />
         </section>
       </div>
     </div>

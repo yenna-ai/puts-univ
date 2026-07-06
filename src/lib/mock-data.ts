@@ -17,23 +17,36 @@ export const CURRENT_YEAR = 2026;
 export const YEARS = [2023, 2024, 2025, 2026] as const;
 export const UISP_YEARS = [2025, 2026] as const;
 
-export const DIVISIONS: Division[] = ["신학과", "기독교교육과", "교회음악학과", "신대원", "대학원"];
-export const UNDERGRAD_DIVISIONS: Division[] = ["신학과", "기독교교육과", "교회음악학과"];
+export const DIVISIONS: Division[] = [
+  "신학과",
+  "기독교교육과",
+  "교회음악학과",
+  "자유전공",
+  "신대원",
+  "대학원",
+];
+export const UNDERGRAD_DIVISIONS: Division[] = ["신학과", "기독교교육과", "교회음악학과", "자유전공"];
 
 export function undergradTotal(byDivision: Record<Division, number>) {
-  return byDivision["신학과"] + byDivision["기독교교육과"] + byDivision["교회음악학과"];
+  return (
+    byDivision["신학과"] +
+    byDivision["기독교교육과"] +
+    byDivision["교회음악학과"] +
+    byDivision["자유전공"]
+  );
 }
 
 // ---------------------------------------------------------------------------
 // 연도별·소속별 더미 데이터 생성 헬퍼
 // ---------------------------------------------------------------------------
 
-/** 대학(3개 학과) : 신대원 : 대학원 = 55 : 30 : 15 비율로 배분 */
+/** 대학(4개 학과) : 신대원 : 대학원 = 55 : 30 : 15 비율로 배분 */
 function splitByDivision(total: number): Record<Division, number> {
   const ratios: [Division, number][] = [
-    ["신학과", 0.3],
-    ["기독교교육과", 0.15],
-    ["교회음악학과", 0.1],
+    ["신학과", 0.25],
+    ["기독교교육과", 0.12],
+    ["교회음악학과", 0.08],
+    ["자유전공", 0.1],
     ["신대원", 0.3],
     ["대학원", 0.15],
   ];
@@ -407,14 +420,15 @@ export const UISP_AREAS = [
 
 const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
   {
+    // uisp.vercel.app 실 데이터(Indicators.csv 2026, KPI_Actuals.csv 2025) 기준
     id: "A11",
     area: "A",
     code: "A11",
     indicator: "자유전공 전공탐색 교과 개발 수",
     dept: "교육혁신처",
-    baseline: 1,
+    baseline: 0,
     target: 2,
-    actual: 2,
+    actual: 3,
     unit: "개",
   },
   {
@@ -423,9 +437,9 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "A121",
     indicator: "교양기초교육 신규교과 개발 수",
     dept: "교육혁신처",
-    baseline: 2,
-    target: 3,
-    actual: 3,
+    baseline: 10,
+    target: 13,
+    actual: 15,
     unit: "개",
   },
   {
@@ -434,20 +448,21 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "A13",
     indicator: "연계・융합전공 교과 개발 수",
     dept: "교육혁신처",
-    baseline: 1,
+    baseline: 0,
     target: 2,
-    actual: 3,
+    actual: 1,
     unit: "개",
   },
   {
+    // B11+B12+B13(하위 항목 합) 합산
     id: "B1",
     area: "B",
     code: "B1",
     indicator: "학생성장 프로그램 운영 수",
     dept: "학생생활상담소",
-    baseline: 5,
-    target: 6,
-    actual: 7,
+    baseline: 35,
+    target: 46,
+    actual: 45,
     unit: "개",
   },
   {
@@ -468,20 +483,21 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "B24",
     indicator: "PUTS+마일리지・인증제 참여 학생 수",
     dept: "교육혁신처",
-    baseline: 120,
-    target: 150,
-    actual: 168,
+    baseline: 0,
+    target: 114,
+    actual: 14,
     unit: "명",
   },
   {
+    // B31/B32/B33/B34/B35(하위 항목 평균) 평균값. 100점 만점 척도
     id: "B3",
     area: "B",
     code: "B3",
     indicator: "학생성장 프로그램 만족도 평균",
     dept: "학생생활상담소",
-    baseline: 4.0,
-    target: 4.2,
-    actual: 4.3,
+    baseline: 82,
+    target: 78,
+    actual: 90,
     unit: "점",
   },
   {
@@ -526,9 +542,9 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "C122",
     indicator: "우수 교과 확산 수",
     dept: "교육혁신처(IR)",
-    baseline: 5,
-    target: 8,
-    actual: 9,
+    baseline: 0,
+    target: 18,
+    actual: 10,
     unit: "개",
   },
   {
@@ -568,14 +584,15 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     linkedField: "teaching_workshop_participant_count",
   },
   {
+    // 100점 만점 척도 (uisp.vercel.app 실 데이터)
     id: "C41",
     area: "C",
     code: "C41",
     indicator: "학생 핵심역량 진단 점수",
     dept: "교육혁신처(IR)",
-    baseline: 3.6,
-    target: 3.8,
-    actual: 3.9,
+    baseline: 79.8,
+    target: 79.86,
+    actual: 82.4,
     unit: "점",
   },
   {
@@ -585,8 +602,8 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     indicator: "LMS 개발・운영 수",
     dept: "교육혁신처(CTL)",
     baseline: 1,
-    target: 2,
-    actual: 2,
+    target: 1,
+    actual: 1,
     unit: "개",
   },
   {
@@ -595,9 +612,9 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "D12",
     indicator: "에듀테크 라이선스 확보・지원 수",
     dept: "교육혁신처(CTL)",
-    baseline: 2,
-    target: 3,
-    actual: 3,
+    baseline: 78,
+    target: 82,
+    actual: 86,
     unit: "건",
   },
   {
@@ -606,9 +623,9 @@ const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
     code: "D21",
     indicator: "LMS 이용자 수",
     dept: "교육혁신처(CTL)",
-    baseline: 2000,
-    target: 2200,
-    actual: 2350,
+    baseline: 581,
+    target: 583,
+    actual: 628,
     unit: "명",
   },
 ];
@@ -882,18 +899,8 @@ export const EVALUATION_ROWS: EvaluationRow[] = EVALUATION_ROWS_BASE.map((r) => 
 }));
 
 // ---------------------------------------------------------------------------
-// 5) 통합 현황 요약
+// 5) 관리 자료 3종 요약
 // ---------------------------------------------------------------------------
-export const OVERVIEW_SUMMARY = {
-  managedDocuments: 3,
-  commonIndicatorCount: COMMON_INDICATORS.length,
-  linkedReportItemCount:
-    UISP_INDICATORS.filter((r) => r.linkedField).length +
-    LTP_ROWS.filter((r) => r.linkedField).length +
-    EVALUATION_ROWS.filter((r) => r.linkedField).length,
-  duplicateSubmissionReduction: 60,
-};
-
 // 항상 "장기발전계획 → 대학기관평가인증 → 대학혁신지원사업" 순서로 노출
 export const REPORT_SUMMARIES = [
   {

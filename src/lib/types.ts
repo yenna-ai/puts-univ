@@ -6,8 +6,14 @@ export type ReportKind = "ltp" | "evaluation" | "uisp";
 /** 보고 주기 상태: 완료된 과거 연도인지, 아직 입력 중인 현재 연도인지 */
 export type YearStatus = "완료" | "입력가능";
 
-/** 소속 구분. 대학(학부)은 3개 학과로 세분화하고, 신대원·대학원은 별도 과정 */
-export type Division = "신학과" | "기독교교육과" | "교회음악학과" | "신대원" | "대학원";
+/** 소속 구분. 대학(학부)은 4개 학과로 세분화하고, 신대원·대학원은 별도 과정 */
+export type Division =
+  | "신학과"
+  | "기독교교육과"
+  | "교회음악학과"
+  | "자유전공"
+  | "신대원"
+  | "대학원";
 
 export interface CommonIndicator {
   /** 공통 데이터 필드명 (DB 컬럼명 느낌) */
