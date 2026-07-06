@@ -26,7 +26,7 @@ export default function UispPage() {
     <div className="flex flex-col">
       <Topbar
         title="대학혁신지원사업"
-        description="UISP · University Innovation Support Project — 자율성과지표 A~D (uisp.vercel.app 용어 기준, 2025년~)"
+        description="자율성과지표 A~D (uisp.vercel.app 용어 기준, 2025년~)"
       />
 
       <div className="space-y-8 p-6">
@@ -41,12 +41,12 @@ export default function UispPage() {
           {UISP_AREAS.map((area) => {
             const rows = resolvedRows.filter((r) => r.area === area.code);
             const linked = rows.filter((r) => r.linkedField).length;
-            const avgRate = Math.round(
+            const avgRate = (
               rows.reduce(
                 (sum, r) => sum + (r.target === 0 ? (r.actual > 0 ? 100 : 0) : (r.actual / r.target) * 100),
                 0
               ) / rows.length
-            );
+            ).toFixed(1);
             return (
               <div key={area.code} className="rounded-lg border border-line bg-card p-4">
                 <div className="flex items-center gap-2">
