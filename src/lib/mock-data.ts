@@ -1567,6 +1567,49 @@ export const EVALUATION_ROWS: EvaluationRow[] = EVALUATION_ROWS_BASE.map((r) => 
 // 5) 관리 자료 3종 요약
 // ---------------------------------------------------------------------------
 // 항상 "장기발전계획 → 대학기관평가인증 → 대학혁신지원사업" 순서로 노출
+// 장기발전계획 평균 달성률 — 지표별(실적/목푯값 · 최신 연도) 단순 평균
+const LTP_AVG_ATTAINMENT =
+  Math.round(
+    (LTP_ROWS.reduce((sum, r) => {
+      const y = r.years.find((yy) => yy.year === CURRENT_YEAR)!;
+      return sum + (y.actualValue / r.target) * 100;
+    }, 0) /
+      LTP_ROWS.length) *
+      10
+  ) / 10;
+
+// 대학혁신지원사업 평균 달성률 — 영역별 실제 집계값(UISP_AREA_ATTAINMENT)을 지표 수로 가중평균
+const UISP_AVG_ATTAINMENT =
+  Math.round(
+    (UISP_AREAS.reduce((sum, a) => {
+      const count = UISP_INDICATORS.filter((r) => r.area === a.code).length;
+      return sum + UISP_AREA_ATTAINMENT[CURRENT_YEAR][a.code] * count;
+    }, 0) /
+      UISP_INDICATORS.length) *
+      10
+  ) / 10;
+
+// 입력률 — 자료마다 "실적이 채워졌는지"를 판단하는 기준이 달라 각각 계산한다.
+// 장기발전계획: 최신 연도 실적값이 입력된 실행과제 비율
+const LTP_INPUT_RATE =
+  Math.round(
+    (LTP_ROWS.filter((r) => r.years.find((yy) => yy.year === CURRENT_YEAR)!.actualValue > 0).length /
+      LTP_ROWS.length) *
+      1000
+  ) / 10;
+// 대학기관평가인증: 증빙 자료 제출이 완료된 항목 비율
+const EVALUATION_INPUT_RATE =
+  Math.round(
+    (EVALUATION_ROWS.filter((r) => r.evidenceStatus === "제출완료").length / EVALUATION_ROWS.length) * 1000
+  ) / 10;
+// 대학혁신지원사업: 최신 연도 실적값이 입력된(진행중이 아닌) 지표 비율
+const UISP_INPUT_RATE =
+  Math.round(
+    (UISP_INDICATORS.filter((r) => r.years.find((yy) => yy.year === CURRENT_YEAR)!.actual > 0).length /
+      UISP_INDICATORS.length) *
+      1000
+  ) / 10;
+
 export const REPORT_SUMMARIES = [
   {
     key: "ltp",
@@ -1575,6 +1618,8 @@ export const REPORT_SUMMARIES = [
     href: "/long-term-plan",
     total: LTP_ROWS.length,
     linked: LTP_ROWS.filter((r) => r.linkedField).length,
+    inputRate: LTP_INPUT_RATE,
+    avgAttainment: LTP_AVG_ATTAINMENT as number | null,
     accent: "navy",
   },
   {
@@ -1584,6 +1629,8 @@ export const REPORT_SUMMARIES = [
     href: "/evaluation",
     total: EVALUATION_ROWS.length,
     linked: EVALUATION_ROWS.filter((r) => r.linkedField).length,
+    inputRate: EVALUATION_INPUT_RATE,
+    avgAttainment: null as number | null,
     accent: "maroon",
   },
   {
@@ -1593,6 +1640,8 @@ export const REPORT_SUMMARIES = [
     href: "/uisp",
     total: UISP_INDICATORS.length,
     linked: UISP_INDICATORS.filter((r) => r.linkedField).length,
+    inputRate: UISP_INPUT_RATE,
+    avgAttainment: UISP_AVG_ATTAINMENT as number | null,
     accent: "gold",
   },
 ] as const;

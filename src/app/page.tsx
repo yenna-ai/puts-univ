@@ -28,7 +28,7 @@ export default function OverviewPage() {
 
         <section>
           <h2 className="mb-3 text-sm font-semibold text-ink/80">
-            자료별 교육혁신처 데이터 연계 현황
+            자료별 지표 현황 및 평균 달성률
           </h2>
           <CoverageChart />
         </section>
