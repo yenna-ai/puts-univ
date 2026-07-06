@@ -5,7 +5,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { IndicatorTable } from "@/components/ui/IndicatorTable";
 import { YearTabs } from "@/components/ui/YearTabs";
 import { LinkedBadge } from "@/components/ui/Badge";
-import { UISP_AREAS, UISP_INDICATORS, UISP_YEARS, CURRENT_YEAR } from "@/lib/mock-data";
+import { UISP_AREAS, UISP_AREA_ATTAINMENT, UISP_INDICATORS, UISP_YEARS, CURRENT_YEAR } from "@/lib/mock-data";
 
 export default function UispPage() {
   const [year, setYear] = useState<number>(CURRENT_YEAR);
@@ -41,12 +41,7 @@ export default function UispPage() {
           {UISP_AREAS.map((area) => {
             const rows = resolvedRows.filter((r) => r.area === area.code);
             const linked = rows.filter((r) => r.linkedField).length;
-            const avgRate = (
-              rows.reduce(
-                (sum, r) => sum + (r.target === 0 ? (r.actual > 0 ? 100 : 0) : (r.actual / r.target) * 100),
-                0
-              ) / rows.length
-            ).toFixed(1);
+            const avgRate = UISP_AREA_ATTAINMENT[year][area.code].toFixed(1);
             return (
               <div key={area.code} className="rounded-lg border border-line bg-card p-4">
                 <div className="flex items-center gap-2">
