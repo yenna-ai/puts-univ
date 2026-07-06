@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { COMMON_INDICATORS, undergradTotal, DIVISIONS } from "@/lib/mock-data";
+import { COMMON_INDICATORS, undergradTotal, DIVISIONS, UNDERGRAD_DIVISIONS } from "@/lib/mock-data";
 import type { Division } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 
@@ -15,6 +15,13 @@ const COL_LABEL: Record<Division, string> = {
   신대원: "신대원",
   대학원: "대학원",
 };
+
+// 대학(학부) 4개 학과 / 신대원 / 대학원 — 세 개의 큰 소속 구분
+const GROUPS: { label: string; divisions: Division[]; tone: string }[] = [
+  { label: "대학", divisions: UNDERGRAD_DIVISIONS, tone: "bg-gold-soft text-gold" },
+  { label: "신대원", divisions: ["신대원"], tone: "bg-navy-soft text-navy" },
+  { label: "대학원", divisions: ["대학원"], tone: "bg-maroon-soft text-maroon" },
+];
 
 function snapshotOf(values: ByDivisionState) {
   return JSON.stringify(values);
@@ -53,15 +60,32 @@ export function DivisionBreakdownTable() {
       <div className="overflow-x-auto rounded-lg border border-line bg-card">
         <table className="w-full min-w-[980px] border-collapse text-sm">
           <thead>
+            <tr className="text-left text-xs text-muted">
+              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 font-medium align-bottom">
+                공통 데이터 항목
+              </th>
+              {GROUPS.map((g) => (
+                <th
+                  key={g.label}
+                  colSpan={g.divisions.length}
+                  className={`border-b border-x border-line px-2 py-1.5 text-center font-semibold ${g.tone}`}
+                >
+                  {g.label}
+                </th>
+              ))}
+              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom text-gold">
+                대학(학부) 합계
+              </th>
+              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom">
+                전체 합계
+              </th>
+            </tr>
             <tr className="border-b border-line bg-line/40 text-left text-xs text-muted">
-              <th className="px-4 py-2.5 font-medium">공통 데이터 항목</th>
               {DIVISIONS.map((d) => (
-                <th key={d} className="px-2 py-2.5 font-medium text-right">
+                <th key={d} className="px-2 py-2 font-medium text-right">
                   {COL_LABEL[d]}
                 </th>
               ))}
-              <th className="px-4 py-2.5 font-medium text-right text-gold">대학(학부) 합계</th>
-              <th className="px-4 py-2.5 font-medium text-right">전체 합계</th>
             </tr>
           </thead>
           <tbody>
