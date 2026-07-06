@@ -13,14 +13,12 @@ export function ProjectCard({
   description,
   href,
   total,
-  linked,
   accent,
 }: {
   title: string;
   description: string;
   href: string;
   total: number;
-  linked: number;
   accent: "navy" | "maroon" | "gold";
 }) {
   const tone = ACCENT_MAP[accent];
@@ -38,9 +36,6 @@ export function ProjectCard({
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <span className={cn("rounded-full px-2.5 py-1 text-xs font-medium", tone.chip)}>
           지표 {total}개
-        </span>
-        <span className="rounded-full bg-line/50 px-2.5 py-1 text-xs font-medium text-muted">
-          교육혁신처 연계 {linked}개
         </span>
       </div>
     </Link>
