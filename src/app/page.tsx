@@ -1,9 +1,7 @@
-import { FileStack, Database, Link2, TrendingDown } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { SummaryCard } from "@/components/ui/SummaryCard";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { DataFlowDiagram } from "@/components/mapping/DataFlowDiagram";
-import { OVERVIEW_SUMMARY, REPORT_SUMMARIES, RECENT_LINKS } from "@/lib/mock-data";
+import { REPORT_SUMMARIES, RECENT_LINKS } from "@/lib/mock-data";
 
 export default function OverviewPage() {
   return (
@@ -14,46 +12,18 @@ export default function OverviewPage() {
       />
 
       <div className="space-y-8 p-6">
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <SummaryCard label="관리 자료" value={OVERVIEW_SUMMARY.managedDocuments} suffix="종" icon={FileStack} accent="muted" />
-          <SummaryCard
-            label="공통 실적 항목"
-            value={OVERVIEW_SUMMARY.commonIndicatorCount}
-            suffix="개"
-            icon={Database}
-            accent="navy"
-          />
-          <SummaryCard
-            label="연결된 장표 항목"
-            value={OVERVIEW_SUMMARY.linkedReportItemCount}
-            suffix="개"
-            icon={Link2}
-            accent="maroon"
-          />
-          <SummaryCard
-            label="반복 제출 감소 예상"
-            value={OVERVIEW_SUMMARY.duplicateSubmissionReduction}
-            suffix="%"
-            icon={TrendingDown}
-            accent="gold"
-          />
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold text-ink/80">관리 자료 3종</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {REPORT_SUMMARIES.map((r) => (
-              <ProjectCard
-                key={r.key}
-                title={r.title}
-                description={r.description}
-                href={r.href}
-                total={r.total}
-                linked={r.linked}
-                accent={r.accent}
-              />
-            ))}
-          </div>
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {REPORT_SUMMARIES.map((r) => (
+            <ProjectCard
+              key={r.key}
+              title={r.title}
+              description={r.description}
+              href={r.href}
+              total={r.total}
+              linked={r.linked}
+              accent={r.accent}
+            />
+          ))}
         </section>
 
         <section>
