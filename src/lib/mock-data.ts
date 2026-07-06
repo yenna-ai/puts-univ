@@ -67,11 +67,16 @@ function ltpYearSeries(actual: string, currentYear = CURRENT_YEAR) {
   const parsed = parseLeadingNumber(actual);
   return YEARS.map((year) => {
     const status: YearStatus = year === currentYear ? "입력가능" : "완료";
-    if (!parsed) return { year, actual, status };
+    if (!parsed) return { year, actual, actualValue: 0, status };
     const yearsBack = currentYear - year;
     const value = backdate(parsed.num, yearsBack, parsed.decimals);
     const formatted = parsed.decimals > 0 ? value.toFixed(parsed.decimals) : String(value);
-    return { year, actual: `${parsed.prefix}${formatted}${parsed.suffix}`, status };
+    return {
+      year,
+      actual: `${parsed.prefix}${formatted}${parsed.suffix}`,
+      actualValue: value,
+      status,
+    };
   });
 }
 
@@ -626,6 +631,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "에듀테크 활용 교과목 수",
     dept: "교육혁신처",
     actual: "18개",
+    target: 15,
+    unit: "개",
     linkedField: "edutech_course_count",
   },
   {
@@ -637,6 +644,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "LMS 활용 교과목 수",
     dept: "교육혁신처",
     actual: "156개",
+    target: 140,
+    unit: "개",
     linkedField: "lms_course_count",
   },
   {
@@ -648,6 +657,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "혁신교수법 적용 교과목 수",
     dept: "교육혁신처",
     actual: "24개",
+    target: 20,
+    unit: "개",
     linkedField: "innovative_teaching_course_count",
   },
   {
@@ -659,6 +670,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "워크숍 운영 건수",
     dept: "교수학습개발원",
     actual: "6건",
+    target: 4,
+    unit: "건",
     linkedField: "teaching_workshop_count",
   },
   {
@@ -670,6 +683,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "워크숍 참여 교원 수",
     dept: "교수학습개발원",
     actual: "86명",
+    target: 70,
+    unit: "명",
     linkedField: "teaching_workshop_participant_count",
   },
   {
@@ -681,6 +696,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "역량진단 참여 학생 수",
     dept: "혁신성과관리센터(IR)",
     actual: "246명",
+    target: 200,
+    unit: "명",
     linkedField: "student_competency_diagnosis_count",
   },
   {
@@ -692,6 +709,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "비교과 프로그램 참여 학생 수(연인원)",
     dept: "학생처",
     actual: "418명",
+    target: 350,
+    unit: "명",
     linkedField: "extracurricular_program_participant_count",
   },
   {
@@ -703,6 +722,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "CQI 제출 교과목 수 / 매 학기 전체 교과목 수 X 100",
     dept: "교육혁신처",
     actual: "132개 제출",
+    target: 120,
+    unit: "개",
     linkedField: "cqi_report_count",
   },
   {
@@ -714,6 +735,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "교육성과 분석보고서 작성 건수",
     dept: "혁신성과관리센터(IR)",
     actual: "4건",
+    target: 4,
+    unit: "건",
     linkedField: "education_outcome_report_count",
   },
   {
@@ -725,6 +748,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "수업개선 환류 사례 수",
     dept: "교무처",
     actual: "12건",
+    target: 10,
+    unit: "건",
     linkedField: "teaching_improvement_feedback_count",
   },
   {
@@ -736,6 +761,8 @@ const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
     formula: "연계 교과목 신규 개발 건수",
     dept: "교무처",
     actual: "3건",
+    target: 2,
+    unit: "건",
   },
 ];
 
@@ -876,7 +903,7 @@ export const REPORT_SUMMARIES = [
     href: "/long-term-plan",
     total: LTP_ROWS.length,
     linked: LTP_ROWS.filter((r) => r.linkedField).length,
-    accent: "indigo",
+    accent: "navy",
   },
   {
     key: "evaluation",
@@ -885,7 +912,7 @@ export const REPORT_SUMMARIES = [
     href: "/evaluation",
     total: EVALUATION_ROWS.length,
     linked: EVALUATION_ROWS.filter((r) => r.linkedField).length,
-    accent: "teal",
+    accent: "maroon",
   },
   {
     key: "uisp",
@@ -894,7 +921,7 @@ export const REPORT_SUMMARIES = [
     href: "/uisp",
     total: UISP_INDICATORS.length,
     linked: UISP_INDICATORS.filter((r) => r.linkedField).length,
-    accent: "blue",
+    accent: "gold",
   },
 ] as const;
 
@@ -912,8 +939,26 @@ export const DOCUMENTS: DocumentDef[] = [
     sections: [
       {
         title: "창의융합 미래선도형 교육과정 혁신",
-        columns: ["추진과제", "실행과제", "성과지표", "지표산식", "담당부서", "실적"],
-        rows: LTP_ROWS.map((r) => [r.task, r.action, r.indicator, r.formula, r.dept, r.actual]),
+        columns: [
+          "추진과제",
+          "실행과제",
+          "성과지표",
+          "지표산식",
+          "담당부서",
+          "목푯값",
+          "실적",
+          "달성률",
+        ],
+        rows: LTP_ROWS.map((r) => [
+          r.task,
+          r.action,
+          r.indicator,
+          r.formula,
+          r.dept,
+          `${r.target}${r.unit}`,
+          r.actual,
+          `${Math.round((r.years.find((y) => y.year === CURRENT_YEAR)!.actualValue / r.target) * 100)}%`,
+        ]),
         linkedFieldColumnIndex: 2,
         linkedRows: LTP_ROWS.map((r) => Boolean(r.linkedField)),
       },

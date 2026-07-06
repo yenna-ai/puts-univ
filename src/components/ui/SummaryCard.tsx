@@ -6,33 +6,32 @@ export function SummaryCard({
   value,
   suffix,
   icon: Icon,
-  accent = "slate",
+  accent = "muted",
 }: {
   label: string;
   value: string | number;
   suffix?: string;
   icon: LucideIcon;
-  accent?: "slate" | "blue" | "indigo" | "teal" | "amber";
+  accent?: "muted" | "navy" | "maroon" | "gold";
 }) {
   const accentMap: Record<string, string> = {
-    slate: "bg-slate-50 text-slate-600",
-    blue: "bg-blue-50 text-blue-700",
-    indigo: "bg-indigo-50 text-indigo-700",
-    teal: "bg-teal-50 text-teal-700",
-    amber: "bg-amber-50 text-amber-700",
+    muted: "bg-line/60 text-muted",
+    navy: "bg-navy-soft text-navy",
+    maroon: "bg-maroon-soft text-maroon",
+    gold: "bg-gold-soft text-gold",
   };
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className="rounded-lg border border-line bg-card p-4 shadow-[0_1px_2px_rgba(22,35,61,0.04)]">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-slate-500">{label}</p>
+        <p className="text-xs font-medium text-muted">{label}</p>
         <div className={cn("flex h-8 w-8 items-center justify-center rounded-md", accentMap[accent])}>
           <Icon className="h-4 w-4" />
         </div>
       </div>
-      <p className="mt-3 text-2xl font-semibold text-slate-900">
+      <p className="mt-3 font-serif text-2xl font-semibold text-ink">
         {value}
-        {suffix && <span className="ml-1 text-sm font-normal text-slate-400">{suffix}</span>}
+        {suffix && <span className="ml-1 text-sm font-normal text-muted">{suffix}</span>}
       </p>
     </div>
   );

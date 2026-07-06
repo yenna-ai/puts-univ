@@ -27,8 +27,8 @@ export function YearTabs({
             className={cn(
               "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
               active
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                ? "border-navy bg-navy text-white"
+                : "border-line bg-card text-ink/70 hover:border-ink/25"
             )}
           >
             {year}년
@@ -36,9 +36,9 @@ export function YearTabs({
               className={cn(
                 "rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                 active
-                  ? "bg-white/20 text-white"
+                  ? "bg-card/20 text-white"
                   : status === "완료"
-                    ? "bg-slate-100 text-slate-500"
+                    ? "bg-line/60 text-muted"
                     : "bg-amber-50 text-amber-600"
               )}
             >

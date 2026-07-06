@@ -72,6 +72,7 @@ export interface UispIndicatorRow {
 export interface LtpYearData {
   year: number;
   actual: string;
+  actualValue: number;
   status: YearStatus;
 }
 
@@ -84,6 +85,8 @@ export interface LtpRow {
   formula: string;
   dept: string;
   actual: string;
+  target: number; // 목푯값 (4단계 기간 공통 목표)
+  unit: string;
   linkedField?: string;
   years: LtpYearData[]; // 연도별 이력 (2023~)
 }

@@ -3,15 +3,15 @@ import { Badge } from "@/components/ui/Badge";
 
 export function DivisionBreakdownTable() {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-x-auto rounded-lg border border-line bg-card">
       <table className="w-full min-w-[900px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs text-slate-500">
+          <tr className="border-b border-line bg-line/40 text-left text-xs text-muted">
             <th className="px-4 py-2.5 font-medium">공통 데이터 항목</th>
             <th className="px-4 py-2.5 font-medium text-right">신학과</th>
             <th className="px-4 py-2.5 font-medium text-right">기독교교육과</th>
             <th className="px-4 py-2.5 font-medium text-right">교회음악학과</th>
-            <th className="px-4 py-2.5 font-medium text-right text-blue-700">대학(학부) 합계</th>
+            <th className="px-4 py-2.5 font-medium text-right text-gold">대학(학부) 합계</th>
             <th className="px-4 py-2.5 font-medium text-right">신대원</th>
             <th className="px-4 py-2.5 font-medium text-right">대학원</th>
             <th className="px-4 py-2.5 font-medium text-right">전체 합계</th>
@@ -21,41 +21,41 @@ export function DivisionBreakdownTable() {
           {COMMON_INDICATORS.map((c) => {
             const undergrad = undergradTotal(c.byDivision);
             return (
-              <tr key={c.field} className="border-b border-slate-100 last:border-0">
+              <tr key={c.field} className="border-b border-line/70 last:border-0">
                 <td className="px-4 py-2.5">
-                  <p className="font-medium text-slate-900">{c.sourceLabel}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">{c.dept}</p>
+                  <p className="font-medium text-ink">{c.sourceLabel}</p>
+                  <p className="mt-0.5 text-xs text-muted/70">{c.dept}</p>
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {c.byDivision["신학과"]}
                   {c.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {c.byDivision["기독교교육과"]}
                   {c.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {c.byDivision["교회음악학과"]}
                   {c.unit}
                 </td>
                 <td className="px-4 py-2.5 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <span className="font-semibold text-blue-700">
+                    <span className="font-semibold text-gold">
                       {undergrad}
                       {c.unit}
                     </span>
-                    {c.uisp && <Badge tone="blue">→ UISP</Badge>}
+                    {c.uisp && <Badge tone="amber">→ UISP</Badge>}
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {c.byDivision["신대원"]}
                   {c.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {c.byDivision["대학원"]}
                   {c.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right font-medium text-slate-900">
+                <td className="px-4 py-2.5 text-right font-medium text-ink">
                   {c.value}
                   {c.unit}
                 </td>

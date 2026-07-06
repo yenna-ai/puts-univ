@@ -1,13 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f7f4ee;
+  --foreground: #211d16;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* 장신비전 팔레트 — 학사모/후드 색상에서 가져온 남색·적갈·황동 3색 체계 */
+  --color-ink: #16233d;
+  --color-ink-2: #24365a;
+  --color-paper: #f7f4ee;
+  --color-card: #fffefb;
+  --color-line: #e6ded0;
+
+  --color-navy: #2a4368;
+  --color-navy-soft: #e7edf5;
+  --color-maroon: #7c2d3a;
+  --color-maroon-soft: #f5e8e7;
+  --color-gold: #9c6b23;
+  --color-gold-soft: #f4ead2;
+
+  --color-muted: #8a8172;
 }
 
 body {

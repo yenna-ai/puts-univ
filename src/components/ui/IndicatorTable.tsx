@@ -15,18 +15,18 @@ function statusOf(row: UispIndicatorRow): UispStatus {
 }
 
 const STATUS_TONE: Record<UispStatus, string> = {
-  초과달성: "bg-blue-50 text-blue-700",
-  달성: "bg-emerald-50 text-emerald-700",
+  초과달성: "bg-gold-soft text-gold",
+  달성: "bg-[#e7efe4] text-[#3f6b3f]",
   미달: "bg-amber-50 text-amber-700",
-  진행중: "bg-slate-100 text-slate-500",
+  진행중: "bg-line/60 text-muted",
 };
 
 export function IndicatorTable({ rows }: { rows: UispIndicatorRow[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-x-auto rounded-lg border border-line bg-card">
       <table className="w-full min-w-[860px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs text-slate-500">
+          <tr className="border-b border-line bg-line/40 text-left text-xs text-muted">
             <th className="px-4 py-2.5 font-medium">코드</th>
             <th className="px-4 py-2.5 font-medium">지표명</th>
             <th className="px-4 py-2.5 font-medium">담당부서</th>
@@ -47,27 +47,27 @@ export function IndicatorTable({ rows }: { rows: UispIndicatorRow[] }) {
               <tr
                 key={row.id}
                 className={cn(
-                  "border-b border-slate-100 last:border-0",
-                  row.linkedField && "bg-blue-50/40"
+                  "border-b border-line/70 last:border-0",
+                  row.linkedField && "bg-navy-soft/40"
                 )}
               >
-                <td className="px-4 py-2.5 font-mono text-xs text-slate-400">{row.code}</td>
-                <td className="px-4 py-2.5 font-medium text-slate-900">
+                <td className="px-4 py-2.5 font-mono text-xs text-muted/70">{row.code}</td>
+                <td className="px-4 py-2.5 font-medium text-ink">
                   <div className="flex items-center gap-2">
                     {row.indicator}
                     {row.linkedField && <LinkedBadge />}
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-slate-500">{row.dept}</td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-muted">{row.dept}</td>
+                <td className="px-4 py-2.5 text-right text-muted">
                   {row.baseline}
                   {row.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-600">
+                <td className="px-4 py-2.5 text-right text-ink/70">
                   {row.target}
                   {row.unit}
                 </td>
-                <td className="px-4 py-2.5 text-right font-medium text-slate-900">
+                <td className="px-4 py-2.5 text-right font-medium text-ink">
                   {row.actual}
                   {row.unit}
                 </td>
@@ -81,7 +81,7 @@ export function IndicatorTable({ rows }: { rows: UispIndicatorRow[] }) {
                     {rate}%
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-right text-slate-500">
+                <td className="px-4 py-2.5 text-right text-muted">
                   {gap > 0 ? "+" : ""}
                   {Number.isInteger(gap) ? gap : gap.toFixed(1)}
                   {row.unit}

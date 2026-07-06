@@ -27,10 +27,10 @@ export default function LongTermPlanPage() {
           statusOf={(y) => (y === CURRENT_YEAR ? "입력가능" : "완료")}
         />
 
-        <section className="rounded-lg border border-indigo-100 bg-indigo-50/60 px-5 py-4">
-          <p className="text-xs font-medium text-indigo-500">추진전략</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">{strategy}</p>
-          <p className="mt-2 text-xs text-slate-500">
+        <section className="rounded-lg border border-navy/25 bg-navy-soft px-5 py-4">
+          <p className="text-xs font-medium text-navy">추진전략</p>
+          <p className="mt-1 text-lg font-semibold text-ink">{strategy}</p>
+          <p className="mt-2 text-xs text-muted">
             {isCurrent ? (
               <>
                 교육혁신처 담당 실행과제 {LTP_ROWS.length}개 중 교육혁신처 공통 데이터 연계{" "}
@@ -43,16 +43,18 @@ export default function LongTermPlanPage() {
           </p>
         </section>
 
-        <section className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <section className="overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full min-w-[1080px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs text-slate-500">
+              <tr className="border-b border-line bg-line/40 text-left text-xs text-muted">
                 <th className="px-4 py-2.5 font-medium">추진과제</th>
                 <th className="px-4 py-2.5 font-medium">실행과제</th>
                 <th className="px-4 py-2.5 font-medium">성과지표</th>
                 <th className="px-4 py-2.5 font-medium">지표산식</th>
                 <th className="px-4 py-2.5 font-medium">담당부서</th>
-                <th className="px-4 py-2.5 font-medium">{year}년 실적</th>
+                <th className="px-4 py-2.5 font-medium text-right">목푯값</th>
+                <th className="px-4 py-2.5 font-medium text-right">{year}년 실적</th>
+                <th className="px-4 py-2.5 font-medium text-right">달성률</th>
                 <th className="px-4 py-2.5 font-medium">연결 데이터</th>
               </tr>
             </thead>
@@ -60,24 +62,38 @@ export default function LongTermPlanPage() {
               {LTP_ROWS.map((row) => {
                 const yearData = row.years.find((y) => y.year === year)!;
                 const showLinked = Boolean(row.linkedField) && isCurrent;
+                const rate = Math.round((yearData.actualValue / row.target) * 100);
                 return (
                   <tr
                     key={row.id}
-                    className={`border-b border-slate-100 last:border-0 align-top ${
-                      showLinked ? "bg-indigo-50/30" : ""
+                    className={`border-b border-line/70 last:border-0 align-top ${
+                      showLinked ? "bg-navy-soft/40" : ""
                     }`}
                   >
-                    <td className="px-4 py-2.5 text-slate-600">{row.task}</td>
-                    <td className="px-4 py-2.5 text-slate-600">{row.action}</td>
-                    <td className="px-4 py-2.5 font-medium text-slate-900">{row.indicator}</td>
-                    <td className="px-4 py-2.5 text-xs text-slate-500">{row.formula}</td>
-                    <td className="px-4 py-2.5 text-slate-500">{row.dept}</td>
-                    <td className="px-4 py-2.5 font-medium text-slate-900">{yearData.actual}</td>
+                    <td className="px-4 py-2.5 text-ink/70">{row.task}</td>
+                    <td className="px-4 py-2.5 text-ink/70">{row.action}</td>
+                    <td className="px-4 py-2.5 font-medium text-ink">{row.indicator}</td>
+                    <td className="px-4 py-2.5 text-xs text-muted">{row.formula}</td>
+                    <td className="px-4 py-2.5 text-muted">{row.dept}</td>
+                    <td className="px-4 py-2.5 text-right text-ink/70">
+                      {row.target}
+                      {row.unit}
+                    </td>
+                    <td className="px-4 py-2.5 text-right font-medium text-ink">
+                      {yearData.actual}
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      <span
+                        className={`font-semibold ${rate >= 100 ? "text-[#3f6b3f]" : "text-gold"}`}
+                      >
+                        {rate}%
+                      </span>
+                    </td>
                     <td className="px-4 py-2.5">
                       {showLinked ? (
-                        <Badge tone="blue">교육혁신처 연계</Badge>
+                        <Badge tone="ink">교육혁신처 연계</Badge>
                       ) : (
-                        <span className="text-xs text-slate-300">-</span>
+                        <span className="text-xs text-muted/50">-</span>
                       )}
                     </td>
                   </tr>

@@ -10,8 +10,10 @@ import {
   Share2,
   FileText,
   Lock,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMobileNav } from "@/components/layout/MobileNavContext";
 
 const NAV_ITEMS = [
   { href: "/", label: "통합 현황", icon: LayoutDashboard },
@@ -26,62 +28,84 @@ const DISABLED_ITEMS = ["사용자 관리", "승인 관리"];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { open, setOpen } = useMobileNav();
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-700 text-sm font-bold text-white">
-          P
-        </div>
-        <div className="leading-tight">
-          <p className="text-sm font-semibold text-slate-900">PUTS 통합 성과관리</p>
-          <p className="text-[11px] text-slate-400">puts-univ.vercel.app · 프로토타입</p>
-        </div>
-      </div>
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-ink/50 lg:hidden"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
-      <nav className="flex-1 space-y-0.5 px-3 py-4">
-        {NAV_ITEMS.map((item) => {
-          const active =
-            item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
-
-        <div className="mt-4 border-t border-slate-100 pt-4">
-          {DISABLED_ITEMS.map((label) => (
-            <div
-              key={label}
-              className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-3 py-2 text-sm text-slate-300"
-            >
-              <Lock className="h-4 w-4 shrink-0" />
-              {label}
-              <span className="ml-auto rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-400">
-                준비중
-              </span>
-            </div>
-          ))}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 flex h-full w-72 shrink-0 flex-col bg-ink text-white transition-transform duration-200 ease-out lg:static lg:z-auto lg:w-64 lg:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-gold/40 bg-ink-2 text-sm font-serif font-bold text-gold">
+            신
+          </div>
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="truncate text-sm font-semibold text-white">PUTS 통합 성과관리</p>
+            <p className="truncate text-[11px] text-white/45">puts-univ.vercel.app · 프로토타입</p>
+          </div>
+          <button
+            onClick={() => setOpen(false)}
+            className="ml-auto text-white/50 hover:text-white lg:hidden"
+            aria-label="메뉴 닫기"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </nav>
 
-      <div className="border-t border-slate-200 px-5 py-4 text-[11px] leading-relaxed text-slate-400">
-        본 화면은 더미 데이터 기반
-        <br />
-        프로토타입입니다.
-      </div>
-    </aside>
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+          {NAV_ITEMS.map((item) => {
+            const active = item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-2.5 rounded-md border-l-2 px-3 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "border-gold bg-card/[0.06] text-gold"
+                    : "border-transparent text-white/65 hover:bg-card/[0.04] hover:text-white"
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
+
+          <div className="mt-4 border-t border-white/10 pt-4">
+            {DISABLED_ITEMS.map((label) => (
+              <div
+                key={label}
+                className="flex cursor-not-allowed items-center gap-2.5 rounded-md border-l-2 border-transparent px-3 py-2 text-sm text-white/25"
+              >
+                <Lock className="h-4 w-4 shrink-0" />
+                {label}
+                <span className="ml-auto rounded bg-card/[0.06] px-1.5 py-0.5 text-[10px] text-white/35">
+                  준비중
+                </span>
+              </div>
+            ))}
+          </div>
+        </nav>
+
+        <div className="border-t border-white/10 px-5 py-4 text-[11px] leading-relaxed text-white/35">
+          본 화면은 더미 데이터 기반
+          <br />
+          프로토타입입니다.
+        </div>
+      </aside>
+    </>
   );
 }

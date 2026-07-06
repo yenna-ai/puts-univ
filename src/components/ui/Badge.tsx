@@ -2,19 +2,19 @@ import { cn } from "@/lib/utils";
 
 export function Badge({
   children,
-  tone = "slate",
+  tone = "muted",
   className,
 }: {
   children: React.ReactNode;
-  tone?: "slate" | "blue" | "green" | "amber" | "red";
+  tone?: "muted" | "ink" | "green" | "amber" | "red";
   className?: string;
 }) {
   const toneMap: Record<string, string> = {
-    slate: "bg-slate-100 text-slate-600",
-    blue: "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200",
-    green: "bg-emerald-50 text-emerald-700",
-    amber: "bg-amber-50 text-amber-700",
-    red: "bg-rose-50 text-rose-700",
+    muted: "bg-line/60 text-muted",
+    ink: "bg-navy-soft text-navy ring-1 ring-inset ring-navy/15",
+    green: "bg-[#e7efe4] text-[#3f6b3f]",
+    amber: "bg-gold-soft text-gold",
+    red: "bg-maroon-soft text-maroon",
   };
 
   return (
@@ -41,8 +41,8 @@ export function EvidenceBadge({ status }: { status: "제출완료" | "준비중"
 
 export function LinkedBadge() {
   return (
-    <Badge tone="blue">
-      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+    <Badge tone="ink">
+      <span className="h-1.5 w-1.5 rounded-full bg-navy" />
       교육혁신처 연계
     </Badge>
   );
