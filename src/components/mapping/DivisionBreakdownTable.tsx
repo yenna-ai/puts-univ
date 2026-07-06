@@ -16,7 +16,7 @@ const COL_LABEL: Record<Division, string> = {
   대학원: "대학원",
 };
 
-// 대학(학부) 4개 학과 / 신대원 / 대학원 — 세 개의 큰 소속 구분
+// 대학(학부) 4개 학과 / 신대원 / 대학원 — "학생 수" 안에서의 세 소속 구분
 const GROUPS: { label: string; divisions: Division[]; tone: string }[] = [
   { label: "대학", divisions: UNDERGRAD_DIVISIONS, tone: "bg-gold-soft text-gold" },
   { label: "신대원", divisions: ["신대원"], tone: "bg-navy-soft text-navy" },
@@ -24,7 +24,7 @@ const GROUPS: { label: string; divisions: Division[]; tone: string }[] = [
 ];
 
 // 소속별 인원 분포 개념이 있는 "학생 수" 항목만 소속별로 나눠 입력하고,
-// "건수"·"교원 수" 항목은 소속 구분이 없어 각각의 전용 칸에 총계로 입력한다.
+// "교원 수"·"건수" 항목은 소속 구분이 없어 각각의 전용 칸에 총계로 입력한다.
 const STUDENT_FIELDS = COMMON_INDICATORS.filter((c) => c.metricKind === "학생 수").map((c) => c.field);
 const METRIC_KIND_OF: Record<string, MetricKind> = Object.fromEntries(
   COMMON_INDICATORS.map((c) => [c.field, c.metricKind])
@@ -41,6 +41,19 @@ const ORIGINAL_TOTALS: TotalState = Object.fromEntries(
   COMMON_INDICATORS.filter((c) => !STUDENT_FIELDS.includes(c.field)).map((c) => [c.field, c.value])
 );
 const ORIGINAL_SNAPSHOT = snapshotOf(ORIGINAL_BY_DIVISION, ORIGINAL_TOTALS);
+
+// 학생 수 / 교원 수 / 건수 / 전체 합계 — 네 그룹을 구분하는 굵은 세로선
+const GROUP_DIVIDER = "border-l-2 border-ink/20";
+
+// 대학/신대원/대학원 각 소속 칸에 옅은 색을 입혀 헤더 아래로도 구분이 이어지도록 함
+const DIVISION_BODY_TONE: Record<Division, string> = {
+  신학과: "bg-gold-soft/25",
+  기독교교육과: "bg-gold-soft/25",
+  교회음악학과: "bg-gold-soft/25",
+  자유전공: "bg-gold-soft/25",
+  신대원: "bg-navy-soft/40 border-l-2 border-line",
+  대학원: "bg-maroon-soft/40 border-l-2 border-line",
+};
 
 function EmptyCell() {
   return <span className="text-muted/40">—</span>;
@@ -86,33 +99,41 @@ export function DivisionBreakdownTable() {
         <table className="w-full min-w-[1180px] border-collapse text-sm">
           <thead>
             <tr className="text-left text-xs text-muted">
-              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 font-medium align-bottom">
+              <th rowSpan={3} className="border-b border-line bg-line/40 px-4 py-2.5 font-medium align-bottom">
                 공통 데이터 항목
               </th>
+              <th colSpan={7} className="border-b border-line bg-line/60 px-2 py-1.5 text-center font-semibold text-ink/70">
+                학생 수
+              </th>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+                교원 수
+              </th>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+                건수
+              </th>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+                전체 합계
+              </th>
+            </tr>
+            <tr className="text-left text-xs text-muted">
               {GROUPS.map((g) => (
                 <th
                   key={g.label}
+                  rowSpan={g.label === "대학" ? 1 : 2}
                   colSpan={g.divisions.length}
-                  className={`border-b border-x border-line px-2 py-1.5 text-center font-semibold ${g.tone}`}
+                  className={`border-b border-line px-2 py-1.5 text-center font-semibold ${
+                    g.label === "대학" ? "" : "border-l-2 border-line"
+                  } ${g.tone}`}
                 >
                   {g.label}
                 </th>
               ))}
-              <th rowSpan={2} className="border-b border-x border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom">
-                건수
-              </th>
-              <th rowSpan={2} className="border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom">
-                교원 수
-              </th>
-              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom text-gold">
+              <th rowSpan={2} className="border-b border-x border-line bg-gold-soft px-4 py-1.5 text-right font-semibold text-gold align-bottom">
                 대학(학부) 합계
-              </th>
-              <th rowSpan={2} className="border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom">
-                전체 합계
               </th>
             </tr>
             <tr className="border-b border-line bg-line/40 text-left text-xs text-muted">
-              {DIVISIONS.map((d) => (
+              {UNDERGRAD_DIVISIONS.map((d) => (
                 <th key={d} className="px-2 py-2 font-medium text-right">
                   {COL_LABEL[d]}
                 </th>
@@ -123,8 +144,8 @@ export function DivisionBreakdownTable() {
             {COMMON_INDICATORS.map((c) => {
               const kind = METRIC_KIND_OF[c.field];
               const isStudentField = kind === "학생 수";
-              const isCountField = kind === "건수";
               const isFacultyField = kind === "교원 수";
+              const isCountField = kind === "건수";
               return (
                 <tr key={c.field} className="border-b border-line/70 last:border-0">
                   <td className="px-4 py-2.5">
@@ -134,7 +155,7 @@ export function DivisionBreakdownTable() {
                     </p>
                   </td>
                   {DIVISIONS.map((d) => (
-                    <td key={d} className="px-2 py-2.5 text-right">
+                    <td key={d} className={`px-2 py-2.5 text-right ${DIVISION_BODY_TONE[d]}`}>
                       {isStudentField ? (
                         <div className="flex items-center justify-end gap-1">
                           <input
@@ -151,23 +172,17 @@ export function DivisionBreakdownTable() {
                       )}
                     </td>
                   ))}
-                  <td className="border-x border-line/70 px-3 py-2.5 text-right">
-                    {isCountField ? (
-                      <div className="flex items-center justify-end gap-1">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={totals[c.field]}
-                          onChange={(e) => setTotal(c.field, e.target.value)}
-                          className="w-16 rounded border border-line bg-paper px-1.5 py-1 text-right text-sm text-ink tabular-nums focus:border-navy focus:outline-none"
-                        />
-                        <span className="text-xs text-muted/70">{c.unit}</span>
-                      </div>
+                  <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-gold">
+                    {isStudentField ? (
+                      <>
+                        {undergradTotal(byDivision[c.field])}
+                        {c.unit}
+                      </>
                     ) : (
                       <EmptyCell />
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-right">
+                  <td className={`px-3 py-2.5 text-right ${GROUP_DIVIDER}`}>
                     {isFacultyField ? (
                       <div className="flex items-center justify-end gap-1">
                         <input
@@ -183,17 +198,23 @@ export function DivisionBreakdownTable() {
                       <EmptyCell />
                     )}
                   </td>
-                  <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-gold">
-                    {isStudentField ? (
-                      <>
-                        {undergradTotal(byDivision[c.field])}
-                        {c.unit}
-                      </>
+                  <td className={`px-3 py-2.5 text-right ${GROUP_DIVIDER}`}>
+                    {isCountField ? (
+                      <div className="flex items-center justify-end gap-1">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={totals[c.field]}
+                          onChange={(e) => setTotal(c.field, e.target.value)}
+                          className="w-16 rounded border border-line bg-paper px-1.5 py-1 text-right text-sm text-ink tabular-nums focus:border-navy focus:outline-none"
+                        />
+                        <span className="text-xs text-muted/70">{c.unit}</span>
+                      </div>
                     ) : (
                       <EmptyCell />
                     )}
                   </td>
-                  <td className="px-4 py-2.5 text-right font-medium tabular-nums text-ink">
+                  <td className={`px-4 py-2.5 text-right font-medium tabular-nums text-ink ${GROUP_DIVIDER}`}>
                     {isStudentField
                       ? DIVISIONS.reduce((sum, d) => sum + byDivision[c.field][d], 0)
                       : totals[c.field]}

@@ -8,7 +8,6 @@ import {
   ClipboardCheck,
   Rocket,
   Share2,
-  FileText,
   Lock,
   X,
 } from "lucide-react";
@@ -21,7 +20,6 @@ const NAV_ITEMS = [
   { href: "/evaluation", label: "대학기관평가인증", icon: ClipboardCheck },
   { href: "/uisp", label: "대학혁신지원사업", icon: Rocket },
   { href: "/data-mapping", label: "실적 입력 예시", icon: Share2 },
-  { href: "/documents", label: "문서형 보기", icon: FileText },
 ];
 
 const DISABLED_ITEMS = ["사용자 관리", "승인 관리"];
@@ -47,9 +45,6 @@ export function Sidebar() {
         )}
       >
         <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-gold/40 bg-ink-2 text-sm font-serif font-bold text-gold">
-            신
-          </div>
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-sm font-semibold text-white">PUTS 통합 성과관리</p>
             <p className="truncate text-[11px] text-white/45">puts-univ.vercel.app · 프로토타입</p>

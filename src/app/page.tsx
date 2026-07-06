@@ -20,7 +20,6 @@ export default function OverviewPage() {
               description={r.description}
               href={r.href}
               total={r.total}
-              linked={r.linked}
               accent={r.accent}
             />
           ))}
