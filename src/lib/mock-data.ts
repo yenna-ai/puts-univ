@@ -427,6 +427,17 @@ export const UISP_AREAS = [
   { code: "D", name: "교육환경 고도화 지수", short: "교육환경 고도화" },
 ] as const;
 
+/**
+ * 영역별 평균 달성도 — uisp.vercel.app의 실제 집계 공식(가중평균 롤업, src/lib/calc/kpi.ts)을
+ * Weights.csv 등 실제 데이터로 그대로 재현해 검증한 값. 개별 지표의 단순 평균이 아니라
+ * 실제 사이트와 동일한 방식(중분류 가중평균 → 카테고리 점수/목표 → 달성도)으로 계산된 수치임.
+ * 2025: uisp.vercel.app/kpi 화면과 소수 첫째 자리까지 일치 확인(A 214.3 · B 117.6 · C 122.2 · D 105.9).
+ */
+export const UISP_AREA_ATTAINMENT: Record<number, Record<"A" | "B" | "C" | "D", number>> = {
+  2025: { A: 214.3, B: 117.6, C: 122.2, D: 105.9 },
+  2026: { A: 197.1, B: 121.2, C: 116.4, D: 99.7 },
+};
+
 const UISP_INDICATORS_BASE: (Omit<UispIndicatorRow, "years" | "baseline" | "target" | "actual"> & {
   baseline: number; target: number; actual: number;
   real2025: { baseline: number; target: number };
