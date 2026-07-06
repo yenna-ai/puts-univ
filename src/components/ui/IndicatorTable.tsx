@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { LinkedBadge } from "@/components/ui/Badge";
 
 function attainmentOf(row: UispIndicatorRow) {
+  if (row.target === 0) return row.actual > 0 ? 100 : 0;
   return Math.round((row.actual / row.target) * 100);
 }
 

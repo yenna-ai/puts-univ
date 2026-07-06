@@ -42,7 +42,10 @@ export default function UispPage() {
             const rows = resolvedRows.filter((r) => r.area === area.code);
             const linked = rows.filter((r) => r.linkedField).length;
             const avgRate = Math.round(
-              rows.reduce((sum, r) => sum + (r.actual / r.target) * 100, 0) / rows.length
+              rows.reduce(
+                (sum, r) => sum + (r.target === 0 ? (r.actual > 0 ? 100 : 0) : (r.actual / r.target) * 100),
+                0
+              ) / rows.length
             );
             return (
               <div key={area.code} className="rounded-lg border border-line bg-card p-4">
