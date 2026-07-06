@@ -99,19 +99,19 @@ export function DivisionBreakdownTable() {
         <table className="w-full min-w-[1180px] border-collapse text-sm">
           <thead>
             <tr className="text-left text-xs text-muted">
-              <th rowSpan={3} className="border-b border-line bg-line/40 px-4 py-2.5 font-medium align-bottom">
+              <th rowSpan={3} className="border-b border-line bg-line/40 px-4 py-2.5 font-medium align-middle">
                 공통 데이터 항목
               </th>
               <th colSpan={7} className="border-b border-line bg-line/60 px-2 py-1.5 text-center font-semibold text-ink/70">
                 학생 수
               </th>
-              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-middle ${GROUP_DIVIDER}`}>
                 교원 수
               </th>
-              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-3 py-2.5 text-right font-medium align-middle ${GROUP_DIVIDER}`}>
                 건수
               </th>
-              <th rowSpan={3} className={`border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-bottom ${GROUP_DIVIDER}`}>
+              <th rowSpan={3} className={`border-b border-line bg-line/40 px-4 py-2.5 text-right font-medium align-middle ${GROUP_DIVIDER}`}>
                 전체 합계
               </th>
             </tr>
@@ -121,14 +121,14 @@ export function DivisionBreakdownTable() {
                   key={g.label}
                   rowSpan={g.label === "대학" ? 1 : 2}
                   colSpan={g.divisions.length}
-                  className={`border-b border-line px-2 py-1.5 text-center font-semibold ${
+                  className={`border-b border-line px-2 py-1.5 text-center font-semibold align-middle ${
                     g.label === "대학" ? "" : "border-l-2 border-line"
                   } ${g.tone}`}
                 >
                   {g.label}
                 </th>
               ))}
-              <th rowSpan={2} className="border-b border-x border-line bg-gold-soft px-4 py-1.5 text-right font-semibold text-gold align-bottom">
+              <th rowSpan={2} className="border-b border-x border-line bg-gold-soft px-4 py-1.5 text-right font-semibold text-gold align-middle">
                 대학(학부) 합계
               </th>
             </tr>
