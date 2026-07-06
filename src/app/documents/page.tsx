@@ -1,0 +1,44 @@
+"use client";
+
+import { useState } from "react";
+import { Topbar } from "@/components/layout/Topbar";
+import { DocumentView } from "@/components/document/DocumentView";
+import { DOCUMENTS } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
+
+export default function DocumentsPage() {
+  const [activeKey, setActiveKey] = useState(DOCUMENTS[0].key);
+  const activeDoc = DOCUMENTS.find((d) => d.key === activeKey) ?? DOCUMENTS[0];
+
+  return (
+    <div className="flex flex-col">
+      <Topbar
+        title="문서형 보기"
+        description="HWP·Excel로 흩어져 있던 자료를 문서 원형 그대로 웹 화면에서 확인합니다"
+      />
+
+      <div className="space-y-4 p-6">
+        <div className="flex gap-1 border-b border-slate-200">
+          {DOCUMENTS.map((doc) => (
+            <button
+              key={doc.key}
+              onClick={() => setActiveKey(doc.key)}
+              className={cn(
+                "border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+                activeKey === doc.key
+                  ? "border-blue-600 text-blue-700"
+                  : "border-transparent text-slate-500 hover:text-slate-800"
+              )}
+            >
+              {doc.key === "uisp" && "대학혁신지원사업"}
+              {doc.key === "ltp" && "장기발전계획"}
+              {doc.key === "evaluation" && "대학평가"}
+            </button>
+          ))}
+        </div>
+
+        <DocumentView doc={activeDoc} />
+      </div>
+    </div>
+  );
+}
