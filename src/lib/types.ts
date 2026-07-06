@@ -17,9 +17,10 @@ export interface CommonIndicator {
   period: string;
   /** 이 실적이 속하는 4대 연계 그룹 */
   group: "에듀테크·혁신교수법" | "교수역량 워크숍" | "학생역량·비교과" | "성과분석·환류";
-  uisp: {
-    area: string; // A/B/C/D 영역
-    task: string; // 세부 사업
+  /** uisp.vercel.app(대학혁신지원사업 실적관리) 자율성과지표와의 연결. 실제 지표가 없으면 undefined */
+  uisp?: {
+    area: string; // A/B/C/D 자율성과지표
+    code: string; // 지표 코드 (예: C111)
     indicator: string; // 지표명
   };
   ltp: {
@@ -35,15 +36,17 @@ export interface CommonIndicator {
   };
 }
 
+export type UispStatus = "초과달성" | "달성" | "미달" | "진행중";
+
 export interface UispIndicatorRow {
   id: string;
   area: "A" | "B" | "C" | "D";
-  areaName: string;
-  task: string;
-  indicator: string;
-  dept: string;
-  target: number;
-  actual: number;
+  code: string; // 지표 코드 (예: C111, D21)
+  indicator: string; // 지표명
+  dept: string; // 담당부서
+  baseline: number; // 기준값
+  target: number; // 목푯값
+  actual: number; // 실적값
   unit: string;
   linkedField?: string; // 공통 데이터 필드와 연결된 경우
 }
@@ -77,6 +80,8 @@ export interface DocumentSection {
   columns: string[];
   rows: (string | number)[][];
   linkedFieldColumnIndex?: number;
+  /** rows[i]가 실제로 교육혁신처 공통 데이터와 연결된 행인지 여부 (linkedFieldColumnIndex와 함께 사용) */
+  linkedRows?: boolean[];
 }
 
 export interface DocumentDef {

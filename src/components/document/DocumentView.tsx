@@ -40,7 +40,7 @@ export function DocumentView({ doc }: { doc: DocumentDef }) {
                     <tr key={i} className="border-b border-slate-100 last:border-0">
                       {row.map((cell, j) => (
                         <td key={j} className="px-3 py-2 text-slate-700">
-                          {j === section.linkedFieldColumnIndex ? (
+                          {j === section.linkedFieldColumnIndex && section.linkedRows?.[i] ? (
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-slate-900">{cell}</span>
                               <Badge tone="blue">연계</Badge>

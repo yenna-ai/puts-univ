@@ -33,10 +33,16 @@ export function DataMappingTable() {
                 </code>
               </td>
               <td className="px-4 py-3 text-slate-700">
-                <p>{c.uisp.indicator}</p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  [{c.uisp.area}영역] {c.uisp.task}
-                </p>
+                {c.uisp ? (
+                  <>
+                    <p>{c.uisp.indicator}</p>
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      자율성과지표 {c.uisp.area} · {c.uisp.code}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-slate-300">UISP 미연계</p>
+                )}
               </td>
               <td className="px-4 py-3 text-slate-700">
                 <p>{c.ltp.indicator}</p>

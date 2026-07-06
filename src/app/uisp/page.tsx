@@ -8,7 +8,7 @@ export default function UispPage() {
     <div className="flex flex-col">
       <Topbar
         title="대학혁신지원사업"
-        description="2026년 대학혁신지원사업 사업계획 · 영역별 지표 실적 (교육혁신처 연계 지표 강조)"
+        description="UISP · University Innovation Support Project — 자율성과지표 A~D (uisp.vercel.app 용어 기준, 교육혁신처 연계 지표 강조)"
       />
 
       <div className="space-y-8 p-6">
@@ -25,11 +25,14 @@ export default function UispPage() {
                   <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-900 text-xs font-bold text-white">
                     {area.code}
                   </span>
-                  <p className="text-sm font-semibold text-slate-900">{area.name}</p>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold text-slate-900">{area.short}</p>
+                    <p className="text-[11px] text-slate-400">{area.name}</p>
+                  </div>
                 </div>
                 <p className="mt-3 text-2xl font-semibold text-slate-900">
                   {avgRate}
-                  <span className="ml-1 text-sm font-normal text-slate-400">% 평균 달성률</span>
+                  <span className="ml-1 text-sm font-normal text-slate-400">% 평균 달성도</span>
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
                   지표 {rows.length}개 · 교육혁신처 연계 {linked}개
@@ -49,7 +52,7 @@ export default function UispPage() {
           return (
             <section key={area.code}>
               <h2 className="mb-3 text-sm font-semibold text-slate-700">
-                {area.code}영역 · {area.name}
+                {area.code} · {area.name}
               </h2>
               <IndicatorTable rows={rows} />
             </section>

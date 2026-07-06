@@ -9,14 +9,14 @@ const GROUPS = Array.from(new Set(COMMON_INDICATORS.map((c) => c.group))).map((g
 const TARGETS = [
   {
     key: "uisp",
-    title: "대학혁신지원사업",
+    title: "대학혁신지원사업 (uisp.vercel.app)",
     tone: "border-blue-200 bg-blue-50/60",
     dot: "bg-blue-600",
     categories: [
-      "에듀테크 기반 수업 활성화",
-      "혁신교수법 운영",
-      "학생역량 진단 및 성과관리",
-      "교육성과 환류 체계 구축",
+      "A 학사 유연화 지수",
+      "B 학생성장 지원 지수",
+      "C PUTS형 교육혁신 지수",
+      "D 교육환경 고도화 지수",
     ],
   },
   {
