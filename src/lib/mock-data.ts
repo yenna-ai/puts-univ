@@ -66,6 +66,12 @@ function backdate(current: number, yearsBack: number, decimals = 0): number {
   return decimals > 0 ? Math.round(v * 10 ** decimals) / 10 ** decimals : Math.max(0, Math.round(v));
 }
 
+/** target이 0인 지표(실적만 있고 목표가 없는 경우)의 0으로 나누기 방지 */
+function attainmentPct(actual: number, target: number): number {
+  if (target === 0) return actual > 0 ? 100 : 0;
+  return Math.round((actual / target) * 100);
+}
+
 function parseLeadingNumber(
   text: string
 ): { num: number; prefix: string; suffix: string; decimals: number } | null {
@@ -148,7 +154,8 @@ function uispYearSeries(
 export const COMMON_INDICATORS: CommonIndicator[] = [
   {
     field: "edutech_course_count",
-    sourceLabel: "에듀테크 기반 수업 운영 교과목 수",
+    sourceLabel: "에듀테크 활용 교과목 운영 수",
+    metricKind: "건수",
     value: 18,
     unit: "개",
     dept: "교육혁신처",
@@ -175,6 +182,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   {
     field: "innovative_teaching_course_count",
     sourceLabel: "혁신교수법 적용 교과목 수",
+    metricKind: "건수",
     value: 24,
     unit: "개",
     dept: "교육혁신처",
@@ -201,6 +209,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   {
     field: "teaching_workshop_count",
     sourceLabel: "교수법 워크숍 운영 건수",
+    metricKind: "건수",
     value: 6,
     unit: "건",
     dept: "교수학습개발원",
@@ -226,7 +235,8 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
   {
     field: "teaching_workshop_participant_count",
-    sourceLabel: "교수법 워크숍 참여 교원 수",
+    sourceLabel: "워크숍 참여 교원 수",
+    metricKind: "교원 수",
     value: 86,
     unit: "명",
     dept: "교수학습개발원",
@@ -252,7 +262,8 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
   {
     field: "cqi_report_count",
-    sourceLabel: "CQI 보고서 제출 교과목 수",
+    sourceLabel: "교과목 CQI 참여율",
+    metricKind: "건수",
     value: 132,
     unit: "개",
     dept: "교육혁신처",
@@ -278,7 +289,8 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
   {
     field: "student_competency_diagnosis_count",
-    sourceLabel: "학생역량 진단 참여 학생 수",
+    sourceLabel: "역량진단 참여 학생 수",
+    metricKind: "학생 수",
     value: 246,
     unit: "명",
     dept: "혁신성과관리센터(IR)",
@@ -305,6 +317,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   {
     field: "extracurricular_program_participant_count",
     sourceLabel: "비교과 프로그램 참여 학생 수",
+    metricKind: "학생 수",
     value: 418,
     unit: "명",
     dept: "학생처",
@@ -331,6 +344,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   {
     field: "lms_course_count",
     sourceLabel: "LMS 활용 교과목 수",
+    metricKind: "건수",
     value: 156,
     unit: "개",
     dept: "교육혁신처",
@@ -353,7 +367,8 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
   {
     field: "education_outcome_report_count",
-    sourceLabel: "교육성과 분석 보고서 작성 건수",
+    sourceLabel: "교육성과 분석보고서 작성 건수",
+    metricKind: "건수",
     value: 4,
     unit: "건",
     dept: "혁신성과관리센터(IR)",
@@ -375,7 +390,8 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
   {
     field: "teaching_improvement_feedback_count",
-    sourceLabel: "수업 개선 환류 사례 수",
+    sourceLabel: "수업개선 환류 사례 수",
+    metricKind: "건수",
     value: 12,
     unit: "건",
     dept: "교무처",
@@ -1640,6 +1656,36 @@ export const DOCUMENTS: DocumentDef[] = [
     updatedAt: "2026-07-03",
     sections: [
       {
+        title: "A. 학사 유연화 지수",
+        columns: ["코드", "지표명", "담당부서", "기준값", "목푯값", "실적값", "달성도"],
+        rows: UISP_INDICATORS.filter((r) => r.area === "A").map((r) => [
+          r.code,
+          r.indicator,
+          r.dept,
+          `${r.baseline}${r.unit}`,
+          `${r.target}${r.unit}`,
+          `${r.actual}${r.unit}`,
+          `${attainmentPct(r.actual, r.target)}%`,
+        ]),
+        linkedFieldColumnIndex: 1,
+        linkedRows: UISP_INDICATORS.filter((r) => r.area === "A").map((r) => Boolean(r.linkedField)),
+      },
+      {
+        title: "B. 학생성장 지원 지수",
+        columns: ["코드", "지표명", "담당부서", "기준값", "목푯값", "실적값", "달성도"],
+        rows: UISP_INDICATORS.filter((r) => r.area === "B").map((r) => [
+          r.code,
+          r.indicator,
+          r.dept,
+          `${r.baseline}${r.unit}`,
+          `${r.target}${r.unit}`,
+          `${r.actual}${r.unit}`,
+          `${attainmentPct(r.actual, r.target)}%`,
+        ]),
+        linkedFieldColumnIndex: 1,
+        linkedRows: UISP_INDICATORS.filter((r) => r.area === "B").map((r) => Boolean(r.linkedField)),
+      },
+      {
         title: "C. PUTS형 교육혁신 지수",
         columns: ["코드", "지표명", "담당부서", "기준값", "목푯값", "실적값", "달성도"],
         rows: UISP_INDICATORS.filter((r) => r.area === "C").map((r) => [
@@ -1649,7 +1695,7 @@ export const DOCUMENTS: DocumentDef[] = [
           `${r.baseline}${r.unit}`,
           `${r.target}${r.unit}`,
           `${r.actual}${r.unit}`,
-          `${Math.round((r.actual / r.target) * 100)}%`,
+          `${attainmentPct(r.actual, r.target)}%`,
         ]),
         linkedFieldColumnIndex: 1,
         linkedRows: UISP_INDICATORS.filter((r) => r.area === "C").map((r) => Boolean(r.linkedField)),
@@ -1664,7 +1710,7 @@ export const DOCUMENTS: DocumentDef[] = [
           `${r.baseline}${r.unit}`,
           `${r.target}${r.unit}`,
           `${r.actual}${r.unit}`,
-          `${Math.round((r.actual / r.target) * 100)}%`,
+          `${attainmentPct(r.actual, r.target)}%`,
         ]),
         linkedFieldColumnIndex: 1,
         linkedRows: UISP_INDICATORS.filter((r) => r.area === "D").map((r) => Boolean(r.linkedField)),
@@ -1672,15 +1718,3 @@ export const DOCUMENTS: DocumentDef[] = [
     ],
   },
 ];
-
-// ---------------------------------------------------------------------------
-// 7) 최근 연결 예시 (통합 현황 하단 표)
-// ---------------------------------------------------------------------------
-export const RECENT_LINKS = COMMON_INDICATORS.slice(0, 5).map((c) => ({
-  sourceLabel: c.sourceLabel,
-  value: `${c.value}${c.unit}`,
-  dept: c.dept,
-  uisp: c.uisp?.indicator ?? "미연계",
-  ltp: c.ltp.indicator,
-  evaluation: c.evaluation.item,
-}));

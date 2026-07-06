@@ -15,11 +15,19 @@ export type Division =
   | "신대원"
   | "대학원";
 
+/**
+ * 실적 성격 구분 — 소속(학과/신대원/대학원)별로 나눠 셀 수 있는 항목은 "학생 수"뿐이며,
+ * "건수"·"교원 수"는 소속별 인원 분포 개념이 없어 단일 합계값으로만 입력한다.
+ */
+export type MetricKind = "건수" | "학생 수" | "교원 수";
+
 export interface CommonIndicator {
   /** 공통 데이터 필드명 (DB 컬럼명 느낌) */
   field: string;
-  /** 교육혁신처가 실제로 입력하는 실적명 */
+  /** 교육혁신처가 실제로 입력하는 실적명 (장기발전계획 세부계획의 성과지표명과 동일) */
   sourceLabel: string;
+  /** 실적 성격 (건수/학생 수/교원 수) */
+  metricKind: MetricKind;
   /** 실적 값 (전체 소속 합계) */
   value: number;
   /** 단위 */

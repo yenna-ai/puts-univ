@@ -9,8 +9,8 @@ export default function DataMappingPage() {
   return (
     <div className="flex flex-col">
       <Topbar
-        title="교육혁신처 데이터 연계"
-        description="교육혁신처 실적 입력 → 공통 데이터 저장 → 장기발전계획·대학기관평가인증·대학혁신지원사업 활용"
+        title="실적 입력 예시 (교육혁신처 사례)"
+        description="부서가 실적을 한 번 입력하면 여러 자료에서 함께 활용되는 구조를, 교육혁신처 사례로 보여드립니다"
       />
 
       <div className="space-y-8 p-6">
@@ -28,14 +28,15 @@ export default function DataMappingPage() {
 
         <section>
           <h2 className="mb-1 text-sm font-semibold text-ink/80">
-            교육혁신처 실적 입력 (대학 4개 학과·신대원·대학원 소속별)
+            교육혁신처 실적 입력 (사례)
           </h2>
           <p className="mb-3 text-xs text-muted">
-            교육혁신처는 실적을 소속(신학과·기독교교육과·교회음악학과·자유전공·신대원·대학원)별로
-            나누어 입력합니다. 대학혁신지원사업은 학부교육 대상 사업이므로{" "}
-            <span className="font-medium text-gold">대학(학부) 합계만</span> 골라 쓰고,
-            장기발전계획·대학기관평가인증에는 신대원·대학원을 포함한 전체 합계가 쓰입니다. 아래
-            값을 직접 바꿔보면 오른쪽 합계가 바로 바뀝니다.
+            소속별 인원 분포가 있는 <span className="font-medium text-gold">학생 수</span> 항목만
+            소속(신학과·기독교교육과·교회음악학과·자유전공·신대원·대학원)별로 나누어 입력하고,
+            건수·교원 수 항목은 소속 구분 없이 총계로 입력합니다. 대학혁신지원사업은 학부교육
+            대상 사업이므로 학생 수 항목의 <span className="font-medium text-gold">대학(학부) 합계만</span>{" "}
+            골라 쓰고, 장기발전계획·대학기관평가인증에는 신대원·대학원을 포함한 전체 합계가
+            쓰입니다. 아래 값을 직접 바꿔보면 오른쪽 합계가 바로 바뀝니다.
           </p>
           <DivisionBreakdownTable />
         </section>

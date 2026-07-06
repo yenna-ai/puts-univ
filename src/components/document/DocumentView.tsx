@@ -1,5 +1,4 @@
 import type { DocumentDef } from "@/lib/types";
-import { Badge } from "@/components/ui/Badge";
 
 const ACCENT_BAR: Record<string, string> = {
   ltp: "bg-navy",
@@ -48,10 +47,7 @@ export function DocumentView({ doc }: { doc: DocumentDef }) {
                       {row.map((cell, j) => (
                         <td key={j} className="px-3 py-2 text-ink/80">
                           {j === section.linkedFieldColumnIndex && section.linkedRows?.[i] ? (
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-ink">{cell}</span>
-                              <Badge tone="ink">연계</Badge>
-                            </div>
+                            <span className="font-medium text-ink">{cell}</span>
                           ) : (
                             cell
                           )}

@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import { COMMON_INDICATORS, undergradTotal, DIVISIONS, UNDERGRAD_DIVISIONS } from "@/lib/mock-data";
 import type { Division } from "@/lib/types";
-import { Badge } from "@/components/ui/Badge";
 
 type ByDivisionState = Record<string, Record<Division, number>>;
+type TotalState = Record<string, number>;
 
 const COL_LABEL: Record<Division, string> = {
   신학과: "신학과",
@@ -23,31 +23,50 @@ const GROUPS: { label: string; divisions: Division[]; tone: string }[] = [
   { label: "대학원", divisions: ["대학원"], tone: "bg-maroon-soft text-maroon" },
 ];
 
-function snapshotOf(values: ByDivisionState) {
-  return JSON.stringify(values);
+// 소속별 인원 분포 개념이 있는 "학생 수" 항목만 소속별로 나눠 입력하고,
+// "건수"·"교원 수" 항목은 소속 구분이 없어 총계 하나로만 입력한다.
+const STUDENT_FIELDS = COMMON_INDICATORS.filter((c) => c.metricKind === "학생 수").map((c) => c.field);
+const MERGED_COLSPAN = DIVISIONS.length + 1; // 소속 6칸 + 대학(학부) 합계 칸
+
+function snapshotOf(byDivision: ByDivisionState, totals: TotalState) {
+  return JSON.stringify({ byDivision, totals });
 }
 
-const ORIGINAL: ByDivisionState = Object.fromEntries(
-  COMMON_INDICATORS.map((c) => [c.field, { ...c.byDivision }])
+const ORIGINAL_BY_DIVISION: ByDivisionState = Object.fromEntries(
+  COMMON_INDICATORS.filter((c) => STUDENT_FIELDS.includes(c.field)).map((c) => [c.field, { ...c.byDivision }])
 );
-const ORIGINAL_SNAPSHOT = snapshotOf(ORIGINAL);
+const ORIGINAL_TOTALS: TotalState = Object.fromEntries(
+  COMMON_INDICATORS.filter((c) => !STUDENT_FIELDS.includes(c.field)).map((c) => [c.field, c.value])
+);
+const ORIGINAL_SNAPSHOT = snapshotOf(ORIGINAL_BY_DIVISION, ORIGINAL_TOTALS);
 
 export function DivisionBreakdownTable() {
-  const [values, setValues] = useState<ByDivisionState>(() => ({ ...ORIGINAL }));
+  const [byDivision, setByDivision] = useState<ByDivisionState>(() => ({ ...ORIGINAL_BY_DIVISION }));
+  const [totals, setTotals] = useState<TotalState>(() => ({ ...ORIGINAL_TOTALS }));
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null);
 
-  const currentSnapshot = useMemo(() => snapshotOf(values), [values]);
+  const currentSnapshot = useMemo(() => snapshotOf(byDivision, totals), [byDivision, totals]);
   const isDirtyFromOriginal = currentSnapshot !== ORIGINAL_SNAPSHOT;
   const hasUnsavedChanges =
     savedSnapshot === null ? isDirtyFromOriginal : currentSnapshot !== savedSnapshot;
 
+  function parseNumber(raw: string) {
+    return Math.max(0, Number(raw.replace(/[^0-9]/g, "")) || 0);
+  }
+
   function setCell(field: string, division: Division, raw: string) {
-    const n = Math.max(0, Number(raw.replace(/[^0-9]/g, "")) || 0);
-    setValues((prev) => ({ ...prev, [field]: { ...prev[field], [division]: n } }));
+    const n = parseNumber(raw);
+    setByDivision((prev) => ({ ...prev, [field]: { ...prev[field], [division]: n } }));
+  }
+
+  function setTotal(field: string, raw: string) {
+    const n = parseNumber(raw);
+    setTotals((prev) => ({ ...prev, [field]: n }));
   }
 
   function reset() {
-    setValues({ ...ORIGINAL });
+    setByDivision({ ...ORIGINAL_BY_DIVISION });
+    setTotals({ ...ORIGINAL_TOTALS });
     setSavedSnapshot(null);
   }
 
@@ -90,42 +109,61 @@ export function DivisionBreakdownTable() {
           </thead>
           <tbody>
             {COMMON_INDICATORS.map((c) => {
-              const row = values[c.field];
-              const undergrad = undergradTotal(row);
-              const total = DIVISIONS.reduce((sum, d) => sum + row[d], 0);
+              const isStudentField = STUDENT_FIELDS.includes(c.field);
               return (
                 <tr key={c.field} className="border-b border-line/70 last:border-0">
                   <td className="px-4 py-2.5">
                     <p className="font-medium text-ink">{c.sourceLabel}</p>
-                    <p className="mt-0.5 text-xs text-muted/70">{c.dept}</p>
+                    <p className="mt-0.5 text-xs text-muted/70">
+                      {c.dept} · {c.metricKind}
+                    </p>
                   </td>
-                  {DIVISIONS.map((d) => (
-                    <td key={d} className="px-2 py-2.5 text-right">
+                  {isStudentField ? (
+                    <>
+                      {DIVISIONS.map((d) => (
+                        <td key={d} className="px-2 py-2.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={byDivision[c.field][d]}
+                              onChange={(e) => setCell(c.field, d, e.target.value)}
+                              className="w-14 rounded border border-line bg-paper px-1.5 py-1 text-right text-sm text-ink tabular-nums focus:border-navy focus:outline-none"
+                            />
+                            <span className="text-xs text-muted/70">{c.unit}</span>
+                          </div>
+                        </td>
+                      ))}
+                      <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-gold">
+                        {undergradTotal(byDivision[c.field])}
+                        {c.unit}
+                      </td>
+                      <td className="px-4 py-2.5 text-right font-medium tabular-nums text-ink">
+                        {DIVISIONS.reduce((sum, d) => sum + byDivision[c.field][d], 0)}
+                        {c.unit}
+                      </td>
+                    </>
+                  ) : (
+                    <td colSpan={MERGED_COLSPAN} className="px-4 py-2.5">
                       <div className="flex items-center justify-end gap-1">
+                        <span className="mr-auto text-xs text-muted/50">소속 구분 없이 총계로 관리</span>
                         <input
                           type="text"
                           inputMode="numeric"
-                          value={row[d]}
-                          onChange={(e) => setCell(c.field, d, e.target.value)}
-                          className="w-14 rounded border border-line bg-paper px-1.5 py-1 text-right text-sm text-ink tabular-nums focus:border-navy focus:outline-none"
+                          value={totals[c.field]}
+                          onChange={(e) => setTotal(c.field, e.target.value)}
+                          className="w-16 rounded border border-line bg-paper px-1.5 py-1 text-right text-sm text-ink tabular-nums focus:border-navy focus:outline-none"
                         />
                         <span className="text-xs text-muted/70">{c.unit}</span>
                       </div>
                     </td>
-                  ))}
-                  <td className="px-4 py-2.5 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <span className="font-semibold tabular-nums text-gold">
-                        {undergrad}
-                        {c.unit}
-                      </span>
-                      {c.uisp && <Badge tone="amber">→ UISP</Badge>}
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-medium tabular-nums text-ink">
-                    {total}
-                    {c.unit}
-                  </td>
+                  )}
+                  {!isStudentField && (
+                    <td className="px-4 py-2.5 text-right font-medium tabular-nums text-ink">
+                      {totals[c.field]}
+                      {c.unit}
+                    </td>
+                  )}
                 </tr>
               );
             })}

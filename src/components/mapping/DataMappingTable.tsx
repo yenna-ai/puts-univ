@@ -51,7 +51,7 @@ export function DataMappingTable() {
                     </p>
                   </>
                 ) : (
-                  <p className="text-xs text-muted/50">UISP 미연계</p>
+                  <p className="text-xs text-muted/50">대학혁신 미연계</p>
                 )}
               </td>
             </tr>

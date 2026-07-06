@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { href: "/long-term-plan", label: "장기발전계획", icon: Target },
   { href: "/evaluation", label: "대학기관평가인증", icon: ClipboardCheck },
   { href: "/uisp", label: "대학혁신지원사업", icon: Rocket },
-  { href: "/data-mapping", label: "교육혁신처 데이터 연계", icon: Share2 },
+  { href: "/data-mapping", label: "실적 입력 예시", icon: Share2 },
   { href: "/documents", label: "문서형 보기", icon: FileText },
 ];
 
@@ -101,9 +101,9 @@ export function Sidebar() {
         </nav>
 
         <div className="border-t border-white/10 px-5 py-4 text-[11px] leading-relaxed text-white/35">
-          본 화면은 더미 데이터 기반
+          본 화면은 예시 데이터를 기반으로
           <br />
-          프로토타입입니다.
+          구성한 화면입니다.
         </div>
       </aside>
     </>
