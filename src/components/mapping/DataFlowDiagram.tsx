@@ -8,18 +8,6 @@ const GROUPS = Array.from(new Set(COMMON_INDICATORS.map((c) => c.group))).map((g
 
 const TARGETS = [
   {
-    key: "uisp",
-    title: "대학혁신지원사업 (uisp.vercel.app)",
-    tone: "border-blue-200 bg-blue-50/60",
-    dot: "bg-blue-600",
-    categories: [
-      "A 학사 유연화 지수",
-      "B 학생성장 지원 지수",
-      "C PUTS형 교육혁신 지수",
-      "D 교육환경 고도화 지수",
-    ],
-  },
-  {
     key: "ltp",
     title: "장기발전계획",
     tone: "border-indigo-200 bg-indigo-50/60",
@@ -33,7 +21,7 @@ const TARGETS = [
   },
   {
     key: "evaluation",
-    title: "대학평가",
+    title: "대학기관평가인증",
     tone: "border-teal-200 bg-teal-50/60",
     dot: "bg-teal-600",
     categories: [
@@ -41,6 +29,18 @@ const TARGETS = [
       "교수학습 지원 체계",
       "학생역량 관리",
       "교육성과 분석 및 환류",
+    ],
+  },
+  {
+    key: "uisp",
+    title: "대학혁신지원사업 (uisp.vercel.app)",
+    tone: "border-blue-200 bg-blue-50/60",
+    dot: "bg-blue-600",
+    categories: [
+      "A 학사 유연화 지수",
+      "B 학생성장 지원 지수",
+      "C PUTS형 교육혁신 지수",
+      "D 교육환경 고도화 지수",
     ],
   },
 ];

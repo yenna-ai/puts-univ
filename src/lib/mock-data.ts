@@ -4,13 +4,121 @@ import type {
   LtpRow,
   EvaluationRow,
   DocumentDef,
+  Division,
+  YearStatus,
+  EvidenceStatus,
 } from "./types";
 
 export const CURRENT_PERIOD = "2026학년도 1학기";
+export const CURRENT_YEAR = 2026;
+
+// 장기발전계획·대학기관평가인증은 2023년(장신비전 2030 4단계 시작)부터,
+// 대학혁신지원사업은 2025년부터 연도별 자료를 관리한다.
+export const YEARS = [2023, 2024, 2025, 2026] as const;
+export const UISP_YEARS = [2025, 2026] as const;
+
+export const DIVISIONS: Division[] = ["신학과", "기독교교육과", "교회음악학과", "신대원", "대학원"];
+export const UNDERGRAD_DIVISIONS: Division[] = ["신학과", "기독교교육과", "교회음악학과"];
+
+export function undergradTotal(byDivision: Record<Division, number>) {
+  return byDivision["신학과"] + byDivision["기독교교육과"] + byDivision["교회음악학과"];
+}
+
+// ---------------------------------------------------------------------------
+// 연도별·소속별 더미 데이터 생성 헬퍼
+// ---------------------------------------------------------------------------
+
+/** 대학(3개 학과) : 신대원 : 대학원 = 55 : 30 : 15 비율로 배분 */
+function splitByDivision(total: number): Record<Division, number> {
+  const ratios: [Division, number][] = [
+    ["신학과", 0.3],
+    ["기독교교육과", 0.15],
+    ["교회음악학과", 0.1],
+    ["신대원", 0.3],
+    ["대학원", 0.15],
+  ];
+  const rounded = ratios.map(([d, r]) => [d, Math.round(total * r)] as const);
+  const diff = total - rounded.reduce((sum, [, v]) => sum + v, 0);
+  return Object.fromEntries(rounded.map(([d, v], i) => [d, i === 0 ? v + diff : v])) as Record<
+    Division,
+    number
+  >;
+}
+
+/** 과거 연도 값을 완만한 성장 곡선으로 역산 (연 12% 내외 증가 추세 가정) */
+function backdate(current: number, yearsBack: number, decimals = 0): number {
+  if (yearsBack <= 0) return current;
+  const factor = Math.pow(0.88, yearsBack);
+  const v = current * factor;
+  return decimals > 0 ? Math.round(v * 10 ** decimals) / 10 ** decimals : Math.max(0, Math.round(v));
+}
+
+function parseLeadingNumber(
+  text: string
+): { num: number; prefix: string; suffix: string; decimals: number } | null {
+  const m = text.match(/^(.*?)(\d+(?:\.\d+)?)(.*)$/);
+  if (!m) return null;
+  const [, prefix, numStr, suffix] = m;
+  const decimals = numStr.includes(".") ? numStr.split(".")[1].length : 0;
+  return { num: parseFloat(numStr), prefix, suffix, decimals };
+}
+
+function ltpYearSeries(actual: string, currentYear = CURRENT_YEAR) {
+  const parsed = parseLeadingNumber(actual);
+  return YEARS.map((year) => {
+    const status: YearStatus = year === currentYear ? "입력가능" : "완료";
+    if (!parsed) return { year, actual, status };
+    const yearsBack = currentYear - year;
+    const value = backdate(parsed.num, yearsBack, parsed.decimals);
+    const formatted = parsed.decimals > 0 ? value.toFixed(parsed.decimals) : String(value);
+    return { year, actual: `${parsed.prefix}${formatted}${parsed.suffix}`, status };
+  });
+}
+
+function evalYearSeries(
+  relatedPerformance: string,
+  evidenceStatus: EvidenceStatus,
+  currentYear = CURRENT_YEAR
+) {
+  const parsed = parseLeadingNumber(relatedPerformance);
+  return YEARS.map((year) => {
+    const status: YearStatus = year === currentYear ? "입력가능" : "완료";
+    let rp = relatedPerformance;
+    if (parsed) {
+      const yearsBack = currentYear - year;
+      const value = backdate(parsed.num, yearsBack, parsed.decimals);
+      const formatted = parsed.decimals > 0 ? value.toFixed(parsed.decimals) : String(value);
+      rp = `${parsed.prefix}${formatted}${parsed.suffix}`;
+    }
+    return {
+      year,
+      relatedPerformance: rp,
+      evidenceStatus: status === "완료" ? ("제출완료" as EvidenceStatus) : evidenceStatus,
+      status,
+    };
+  });
+}
+
+function uispYearSeries(baseline: number, target: number, actual: number, currentYear = CURRENT_YEAR) {
+  return UISP_YEARS.map((year) => {
+    if (year === currentYear) {
+      return { year, baseline, target, actual, status: "입력가능" as YearStatus };
+    }
+    return {
+      year,
+      baseline: backdate(baseline, 1),
+      target: backdate(target, 1),
+      actual: baseline,
+      status: "완료" as YearStatus,
+    };
+  });
+}
 
 // ---------------------------------------------------------------------------
 // 1) 교육혁신처 기준 공통 실적 데이터 10종
-//    -> 대학혁신지원사업 / 장기발전계획 / 대학평가 3개 장표와의 연계 매핑
+//    -> 장기발전계획 / 대학기관평가인증 / 대학혁신지원사업 3개 장표와의 연계 매핑
+//    소속(대학 3개 학과·신대원·대학원)별로 분포하며, 대학혁신지원사업에는
+//    이 중 대학(학부) 몫만 반영된다.
 // ---------------------------------------------------------------------------
 export const COMMON_INDICATORS: CommonIndicator[] = [
   {
@@ -21,6 +129,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교육혁신처",
     period: CURRENT_PERIOD,
     group: "에듀테크·혁신교수법",
+    byDivision: splitByDivision(18),
     uisp: {
       area: "C",
       code: "C111",
@@ -46,6 +155,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교육혁신처",
     period: CURRENT_PERIOD,
     group: "에듀테크·혁신교수법",
+    byDivision: splitByDivision(24),
     uisp: {
       area: "C",
       code: "C112",
@@ -71,6 +181,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교수학습개발원",
     period: CURRENT_PERIOD,
     group: "교수역량 워크숍",
+    byDivision: splitByDivision(6),
     uisp: {
       area: "C",
       code: "C131",
@@ -96,6 +207,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교수학습개발원",
     period: CURRENT_PERIOD,
     group: "교수역량 워크숍",
+    byDivision: splitByDivision(86),
     uisp: {
       area: "C",
       code: "C232",
@@ -121,6 +233,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교육혁신처",
     period: CURRENT_PERIOD,
     group: "성과분석·환류",
+    byDivision: splitByDivision(132),
     uisp: {
       area: "C",
       code: "C121",
@@ -146,6 +259,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "혁신성과관리센터(IR)",
     period: CURRENT_PERIOD,
     group: "학생역량·비교과",
+    byDivision: splitByDivision(246),
     uisp: {
       area: "C",
       code: "C221",
@@ -171,6 +285,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "학생처",
     period: CURRENT_PERIOD,
     group: "학생역량·비교과",
+    byDivision: splitByDivision(418),
     uisp: {
       area: "B",
       code: "B2",
@@ -196,8 +311,9 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교육혁신처",
     period: CURRENT_PERIOD,
     group: "에듀테크·혁신교수법",
+    byDivision: splitByDivision(156),
     // uisp.vercel.app 자율성과지표에는 "LMS 이용자 수(D21)"만 있고 "교과목 수" 단위의
-    // 동일 지표가 없어 UISP 연계는 아직 없음 (장기발전계획·대학평가에서만 활용)
+    // 동일 지표가 없어 UISP 연계는 아직 없음 (장기발전계획·대학기관평가인증에서만 활용)
     ltp: {
       strategy: "창의융합 미래선도형 교육과정 혁신",
       task: "교육혁신 체계 고도화",
@@ -218,6 +334,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "혁신성과관리센터(IR)",
     period: CURRENT_PERIOD,
     group: "성과분석·환류",
+    byDivision: splitByDivision(4),
     // uisp.vercel.app에는 보고서 "작성 건수"를 세는 지표가 없어 UISP 연계는 아직 없음
     ltp: {
       strategy: "창의융합 미래선도형 교육과정 혁신",
@@ -239,6 +356,7 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
     dept: "교무처",
     period: CURRENT_PERIOD,
     group: "성과분석·환류",
+    byDivision: splitByDivision(12),
     // uisp.vercel.app에는 "환류 사례 수"에 대응하는 지표가 없어 UISP 연계는 아직 없음
     ltp: {
       strategy: "창의융합 미래선도형 교육과정 혁신",
@@ -254,10 +372,26 @@ export const COMMON_INDICATORS: CommonIndicator[] = [
   },
 ];
 
+function undergradShare(field: string) {
+  const c = COMMON_INDICATORS.find((x) => x.field === field);
+  if (!c) throw new Error(`unknown common indicator field: ${field}`);
+  const undergrad = undergradTotal(c.byDivision);
+  return { undergrad, ratio: undergrad / c.value };
+}
+
+const edutechShare = undergradShare("edutech_course_count");
+const innovativeTeachingShare = undergradShare("innovative_teaching_course_count");
+const workshopCountShare = undergradShare("teaching_workshop_count");
+const workshopParticipantShare = undergradShare("teaching_workshop_participant_count");
+const cqiShare = undergradShare("cqi_report_count");
+const competencyShare = undergradShare("student_competency_diagnosis_count");
+const extracurricularShare = undergradShare("extracurricular_program_participant_count");
+
 // ---------------------------------------------------------------------------
 // 2) 대학혁신지원사업 (UISP) — uisp.vercel.app 실제 자율성과지표 A~D 체계 그대로 사용
 //    (지표 코드·지표명·담당부서는 yenna-ai/uisp 저장소의 Indicators.csv / Users.csv 기준)
-//    linkedField 가 있는 행은 교육혁신처 공통 데이터와 연결된 지표
+//    linkedField 가 있는 행은 교육혁신처 공통 데이터 중 "대학(학부)" 몫만 반영된 지표
+//    (대학혁신지원사업은 학부교육 대상 사업이므로 신대원·대학원 실적은 제외)
 // ---------------------------------------------------------------------------
 export const UISP_AREAS = [
   { code: "A", name: "학사 유연화 지수", short: "학사 유연화" },
@@ -266,7 +400,7 @@ export const UISP_AREAS = [
   { code: "D", name: "교육환경 고도화 지수", short: "교육환경 고도화" },
 ] as const;
 
-export const UISP_INDICATORS: UispIndicatorRow[] = [
+const UISP_INDICATORS_BASE: Omit<UispIndicatorRow, "years">[] = [
   {
     id: "A11",
     area: "A",
@@ -317,9 +451,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "B2",
     indicator: "학생성장 프로그램 참여 학생 수",
     dept: "학생생활상담소",
-    baseline: 300,
-    target: 350,
-    actual: 418,
+    baseline: Math.round(300 * extracurricularShare.ratio),
+    target: Math.round(350 * extracurricularShare.ratio),
+    actual: extracurricularShare.undergrad,
     unit: "명",
     linkedField: "extracurricular_program_participant_count",
   },
@@ -351,9 +485,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C111",
     indicator: "에듀테크 활용 교과 운영 수",
     dept: "교육혁신처(CTL)",
-    baseline: 10,
-    target: 15,
-    actual: 18,
+    baseline: Math.round(10 * edutechShare.ratio),
+    target: Math.round(15 * edutechShare.ratio),
+    actual: edutechShare.undergrad,
     unit: "개",
     linkedField: "edutech_course_count",
   },
@@ -363,9 +497,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C112",
     indicator: "혁신교수법 적용 교과 운영 수",
     dept: "교육혁신처(CTL)",
-    baseline: 15,
-    target: 20,
-    actual: 24,
+    baseline: Math.round(15 * innovativeTeachingShare.ratio),
+    target: Math.round(20 * innovativeTeachingShare.ratio),
+    actual: innovativeTeachingShare.undergrad,
     unit: "개",
     linkedField: "innovative_teaching_course_count",
   },
@@ -375,9 +509,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C121",
     indicator: "CQI 입력 수",
     dept: "교육혁신처(IR)",
-    baseline: 100,
-    target: 120,
-    actual: 132,
+    baseline: Math.round(100 * cqiShare.ratio),
+    target: Math.round(120 * cqiShare.ratio),
+    actual: cqiShare.undergrad,
     unit: "개",
     linkedField: "cqi_report_count",
   },
@@ -398,9 +532,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C131",
     indicator: "교수역량 강화 프로그램(기존) 운영 수",
     dept: "교육혁신처(CTL)",
-    baseline: 3,
-    target: 4,
-    actual: 6,
+    baseline: Math.round(3 * workshopCountShare.ratio),
+    target: Math.round(4 * workshopCountShare.ratio),
+    actual: workshopCountShare.undergrad,
     unit: "건",
     linkedField: "teaching_workshop_count",
   },
@@ -410,9 +544,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C221",
     indicator: "역량진단・강화 프로그램(기존) 참여 학생 수",
     dept: "교육혁신처(IR)",
-    baseline: 180,
-    target: 200,
-    actual: 246,
+    baseline: Math.round(180 * competencyShare.ratio),
+    target: Math.round(200 * competencyShare.ratio),
+    actual: competencyShare.undergrad,
     unit: "명",
     linkedField: "student_competency_diagnosis_count",
   },
@@ -422,9 +556,9 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
     code: "C232",
     indicator: "강화 프로그램 참여 교원 수",
     dept: "교육혁신처(CTL)",
-    baseline: 50,
-    target: 70,
-    actual: 86,
+    baseline: Math.round(50 * workshopParticipantShare.ratio),
+    target: Math.round(70 * workshopParticipantShare.ratio),
+    actual: workshopParticipantShare.undergrad,
     unit: "명",
     linkedField: "teaching_workshop_participant_count",
   },
@@ -474,10 +608,15 @@ export const UISP_INDICATORS: UispIndicatorRow[] = [
   },
 ];
 
+export const UISP_INDICATORS: UispIndicatorRow[] = UISP_INDICATORS_BASE.map((r) => ({
+  ...r,
+  years: uispYearSeries(r.baseline, r.target, r.actual),
+}));
+
 // ---------------------------------------------------------------------------
-// 3) 장기발전계획(장신비전 2030 4단계) — 교육혁신처 관련 발췌
+// 3) 장기발전계획(장신비전 2030 4단계) — 교육혁신처 관련 발췌 (2023년~)
 // ---------------------------------------------------------------------------
-export const LTP_ROWS: LtpRow[] = [
+const LTP_ROWS_BASE: Omit<LtpRow, "years">[] = [
   {
     id: "ltp-01",
     strategy: "창의융합 미래선도형 교육과정 혁신",
@@ -600,10 +739,15 @@ export const LTP_ROWS: LtpRow[] = [
   },
 ];
 
+export const LTP_ROWS: LtpRow[] = LTP_ROWS_BASE.map((r) => ({
+  ...r,
+  years: ltpYearSeries(r.actual),
+}));
+
 // ---------------------------------------------------------------------------
-// 4) 대학평가 — 교육혁신처 관련 발췌
+// 4) 대학기관평가인증 — 교육혁신처 관련 발췌 (2023년~)
 // ---------------------------------------------------------------------------
-export const EVALUATION_ROWS: EvaluationRow[] = [
+const EVALUATION_ROWS_BASE: Omit<EvaluationRow, "years">[] = [
   {
     id: "eval-01",
     area: "교육과정 운영 및 개선",
@@ -705,6 +849,11 @@ export const EVALUATION_ROWS: EvaluationRow[] = [
   },
 ];
 
+export const EVALUATION_ROWS: EvaluationRow[] = EVALUATION_ROWS_BASE.map((r) => ({
+  ...r,
+  years: evalYearSeries(r.relatedPerformance, r.evidenceStatus),
+}));
+
 // ---------------------------------------------------------------------------
 // 5) 통합 현황 요약
 // ---------------------------------------------------------------------------
@@ -718,20 +867,12 @@ export const OVERVIEW_SUMMARY = {
   duplicateSubmissionReduction: 60,
 };
 
+// 항상 "장기발전계획 → 대학기관평가인증 → 대학혁신지원사업" 순서로 노출
 export const REPORT_SUMMARIES = [
-  {
-    key: "uisp",
-    title: "대학혁신지원사업",
-    description: "자율성과지표 A~D 18개 지표 · 교육혁신처 연계 7개 (uisp.vercel.app 용어 기준)",
-    href: "/uisp",
-    total: UISP_INDICATORS.length,
-    linked: UISP_INDICATORS.filter((r) => r.linkedField).length,
-    accent: "blue",
-  },
   {
     key: "ltp",
     title: "장기발전계획",
-    description: "장신비전 2030 4단계 · 교육혁신처 실행과제 11개",
+    description: "장신비전 2030 4단계 · 2023~2026년 · 교육혁신처 실행과제 11개",
     href: "/long-term-plan",
     total: LTP_ROWS.length,
     linked: LTP_ROWS.filter((r) => r.linkedField).length,
@@ -739,23 +880,72 @@ export const REPORT_SUMMARIES = [
   },
   {
     key: "evaluation",
-    title: "대학평가",
-    description: "4개 평가영역 10개 항목 · 증빙 준비 현황 포함",
+    title: "대학기관평가인증",
+    description: "2023~2026년 · 4개 평가영역 10개 항목 · 증빙 준비 현황 포함",
     href: "/evaluation",
     total: EVALUATION_ROWS.length,
     linked: EVALUATION_ROWS.filter((r) => r.linkedField).length,
     accent: "teal",
   },
+  {
+    key: "uisp",
+    title: "대학혁신지원사업",
+    description: "2025~2026년 · 자율성과지표 A~D 18개 지표 · 교육혁신처 연계 7개",
+    href: "/uisp",
+    total: UISP_INDICATORS.length,
+    linked: UISP_INDICATORS.filter((r) => r.linkedField).length,
+    accent: "blue",
+  },
 ] as const;
 
 // ---------------------------------------------------------------------------
-// 6) 문서형 보기 — HWP/Excel 문서를 웹으로 옮긴 형태
+// 6) 문서형 보기 — HWP/Excel 문서를 웹으로 옮긴 형태 (2026년 최신 자료 기준)
+//    항상 "장기발전계획 → 대학기관평가인증 → 대학혁신지원사업" 순서로 노출
 // ---------------------------------------------------------------------------
 export const DOCUMENTS: DocumentDef[] = [
   {
+    key: "ltp",
+    title: "장신비전 2030 4단계 장기발전계획 추진실적표",
+    subtitle: "교육혁신처 (발췌) · 2026년 기준",
+    owner: "교육혁신처",
+    updatedAt: "2026-07-01",
+    sections: [
+      {
+        title: "창의융합 미래선도형 교육과정 혁신",
+        columns: ["추진과제", "실행과제", "성과지표", "지표산식", "담당부서", "실적"],
+        rows: LTP_ROWS.map((r) => [r.task, r.action, r.indicator, r.formula, r.dept, r.actual]),
+        linkedFieldColumnIndex: 2,
+        linkedRows: LTP_ROWS.map((r) => Boolean(r.linkedField)),
+      },
+    ],
+  },
+  {
+    key: "evaluation",
+    title: "대학기관평가인증 자체진단 보고서",
+    subtitle: "교육과정·교수학습·학생역량·성과환류 영역 (발췌) · 2026년 기준",
+    owner: "혁신성과관리센터(IR)",
+    updatedAt: "2026-06-28",
+    sections: [
+      {
+        title: "평가영역별 요구자료 및 증빙 현황",
+        columns: ["평가영역", "평가항목", "요구자료", "담당부서", "관련 실적", "증빙상태"],
+        rows: EVALUATION_ROWS.map((r) => [
+          r.area,
+          r.item,
+          r.material,
+          r.dept,
+          r.relatedPerformance,
+          r.evidenceStatus,
+        ]),
+        linkedFieldColumnIndex: 1,
+        linkedRows: EVALUATION_ROWS.map((r) => Boolean(r.linkedField)),
+      },
+    ],
+  },
+  {
     key: "uisp",
     title: "2026년 대학혁신지원사업 자율성과지표 실적표",
-    subtitle: "uisp.vercel.app · 지표 상세 (발췌)",
+    subtitle: "uisp.vercel.app · 지표 상세 (발췌) · 대학(학부) 몫만 반영",
     owner: "교육혁신처",
     updatedAt: "2026-07-03",
     sections: [
@@ -788,52 +978,6 @@ export const DOCUMENTS: DocumentDef[] = [
         ]),
         linkedFieldColumnIndex: 1,
         linkedRows: UISP_INDICATORS.filter((r) => r.area === "D").map((r) => Boolean(r.linkedField)),
-      },
-    ],
-  },
-  {
-    key: "ltp",
-    title: "장신비전 2030 4단계 장기발전계획 추진실적표",
-    subtitle: "교육혁신처 (발췌)",
-    owner: "교육혁신처",
-    updatedAt: "2026-07-01",
-    sections: [
-      {
-        title: "창의융합 미래선도형 교육과정 혁신",
-        columns: ["추진과제", "실행과제", "성과지표", "지표산식", "담당부서", "실적"],
-        rows: LTP_ROWS.map((r) => [
-          r.task,
-          r.action,
-          r.indicator,
-          r.formula,
-          r.dept,
-          r.actual,
-        ]),
-        linkedFieldColumnIndex: 2,
-        linkedRows: LTP_ROWS.map((r) => Boolean(r.linkedField)),
-      },
-    ],
-  },
-  {
-    key: "evaluation",
-    title: "대학평가 자체진단 보고서",
-    subtitle: "교육과정·교수학습·학생역량·성과환류 영역 (발췌)",
-    owner: "혁신성과관리센터(IR)",
-    updatedAt: "2026-06-28",
-    sections: [
-      {
-        title: "평가영역별 요구자료 및 증빙 현황",
-        columns: ["평가영역", "평가항목", "요구자료", "담당부서", "관련 실적", "증빙상태"],
-        rows: EVALUATION_ROWS.map((r) => [
-          r.area,
-          r.item,
-          r.material,
-          r.dept,
-          r.relatedPerformance,
-          r.evidenceStatus,
-        ]),
-        linkedFieldColumnIndex: 1,
-        linkedRows: EVALUATION_ROWS.map((r) => Boolean(r.linkedField)),
       },
     ],
   },

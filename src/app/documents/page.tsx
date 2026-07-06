@@ -30,9 +30,9 @@ export default function DocumentsPage() {
                   : "border-transparent text-slate-500 hover:text-slate-800"
               )}
             >
-              {doc.key === "uisp" && "대학혁신지원사업"}
               {doc.key === "ltp" && "장기발전계획"}
-              {doc.key === "evaluation" && "대학평가"}
+              {doc.key === "evaluation" && "대학기관평가인증"}
+              {doc.key === "uisp" && "대학혁신지원사업"}
             </button>
           ))}
         </div>

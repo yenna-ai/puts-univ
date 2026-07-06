@@ -1,20 +1,45 @@
+"use client";
+
+import { useState } from "react";
 import { Topbar } from "@/components/layout/Topbar";
 import { IndicatorTable } from "@/components/ui/IndicatorTable";
+import { YearTabs } from "@/components/ui/YearTabs";
 import { LinkedBadge } from "@/components/ui/Badge";
-import { UISP_AREAS, UISP_INDICATORS } from "@/lib/mock-data";
+import { UISP_AREAS, UISP_INDICATORS, UISP_YEARS, CURRENT_YEAR } from "@/lib/mock-data";
 
 export default function UispPage() {
+  const [year, setYear] = useState<number>(CURRENT_YEAR);
+  const isCurrent = year === CURRENT_YEAR;
+
+  const resolvedRows = UISP_INDICATORS.map((r) => {
+    const yearData = r.years.find((y) => y.year === year)!;
+    return {
+      ...r,
+      baseline: yearData.baseline,
+      target: yearData.target,
+      actual: yearData.actual,
+      linkedField: isCurrent ? r.linkedField : undefined,
+    };
+  });
+
   return (
     <div className="flex flex-col">
       <Topbar
         title="대학혁신지원사업"
-        description="UISP · University Innovation Support Project — 자율성과지표 A~D (uisp.vercel.app 용어 기준, 교육혁신처 연계 지표 강조)"
+        description="UISP · University Innovation Support Project — 자율성과지표 A~D (uisp.vercel.app 용어 기준, 2025년~)"
       />
 
       <div className="space-y-8 p-6">
+        <YearTabs
+          years={UISP_YEARS}
+          value={year}
+          onChange={setYear}
+          statusOf={(y) => (y === CURRENT_YEAR ? "입력가능" : "완료")}
+        />
+
         <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {UISP_AREAS.map((area) => {
-            const rows = UISP_INDICATORS.filter((r) => r.area === area.code);
+            const rows = resolvedRows.filter((r) => r.area === area.code);
             const linked = rows.filter((r) => r.linkedField).length;
             const avgRate = Math.round(
               rows.reduce((sum, r) => sum + (r.actual / r.target) * 100, 0) / rows.length
@@ -44,11 +69,13 @@ export default function UispPage() {
 
         <section className="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3 text-xs text-blue-700">
           <LinkedBadge />
-          표시가 붙은 지표는 교육혁신처 공통 실적 데이터에서 자동으로 채워지는 항목입니다.
+          {isCurrent
+            ? "표시가 붙은 지표는 교육혁신처 공통 실적 데이터(대학 몫)에서 자동으로 채워지는 항목입니다."
+            : `${year}년은 이미 마감된 자료로, 당시에는 개별 입력 방식이었습니다.`}
         </section>
 
         {UISP_AREAS.map((area) => {
-          const rows = UISP_INDICATORS.filter((r) => r.area === area.code);
+          const rows = resolvedRows.filter((r) => r.area === area.code);
           return (
             <section key={area.code}>
               <h2 className="mb-3 text-sm font-semibold text-slate-700">

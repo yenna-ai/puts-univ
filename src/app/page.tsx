@@ -10,7 +10,7 @@ export default function OverviewPage() {
     <div className="flex flex-col">
       <Topbar
         title="통합 현황"
-        description="대학혁신지원사업 · 장기발전계획 · 대학평가 — 하나의 실적 데이터가 세 자료에서 함께 활용되는 구조"
+        description="장기발전계획 · 대학기관평가인증 · 대학혁신지원사업 — 하나의 실적 데이터가 세 자료에서 함께 활용되는 구조"
       />
 
       <div className="space-y-8 p-6">
@@ -72,9 +72,9 @@ export default function OverviewPage() {
                   <th className="px-4 py-2.5 font-medium">교육혁신처 입력 실적</th>
                   <th className="px-4 py-2.5 font-medium">실적값</th>
                   <th className="px-4 py-2.5 font-medium">담당부서</th>
-                  <th className="px-4 py-2.5 font-medium text-blue-700">대학혁신지원사업</th>
                   <th className="px-4 py-2.5 font-medium text-indigo-700">장기발전계획</th>
-                  <th className="px-4 py-2.5 font-medium text-teal-700">대학평가</th>
+                  <th className="px-4 py-2.5 font-medium text-teal-700">대학기관평가인증</th>
+                  <th className="px-4 py-2.5 font-medium text-blue-700">대학혁신지원사업</th>
                 </tr>
               </thead>
               <tbody>
@@ -83,9 +83,9 @@ export default function OverviewPage() {
                     <td className="px-4 py-2.5 font-medium text-slate-900">{row.sourceLabel}</td>
                     <td className="px-4 py-2.5 text-slate-600">{row.value}</td>
                     <td className="px-4 py-2.5 text-slate-500">{row.dept}</td>
-                    <td className="px-4 py-2.5 text-slate-700">{row.uisp}</td>
                     <td className="px-4 py-2.5 text-slate-700">{row.ltp}</td>
                     <td className="px-4 py-2.5 text-slate-700">{row.evaluation}</td>
+                    <td className="px-4 py-2.5 text-slate-700">{row.uisp}</td>
                   </tr>
                 ))}
               </tbody>

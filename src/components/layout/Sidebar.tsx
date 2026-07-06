@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/", label: "통합 현황", icon: LayoutDashboard },
   { href: "/long-term-plan", label: "장기발전계획", icon: Target },
-  { href: "/evaluation", label: "대학평가", icon: ClipboardCheck },
+  { href: "/evaluation", label: "대학기관평가인증", icon: ClipboardCheck },
   { href: "/uisp", label: "대학혁신지원사업", icon: Rocket },
   { href: "/data-mapping", label: "교육혁신처 데이터 연계", icon: Share2 },
   { href: "/documents", label: "문서형 보기", icon: FileText },

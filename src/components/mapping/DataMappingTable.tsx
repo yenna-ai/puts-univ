@@ -8,13 +8,15 @@ export function DataMappingTable() {
           <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs text-slate-500">
             <th className="w-[15%] px-4 py-2.5 font-medium">교육혁신처 입력 실적</th>
             <th className="w-[15%] px-4 py-2.5 font-medium">공통 데이터 항목</th>
-            <th className="w-[23.3%] px-4 py-2.5 font-medium text-blue-700">
-              대학혁신지원사업 활용
-            </th>
             <th className="w-[23.3%] px-4 py-2.5 font-medium text-indigo-700">
               장기발전계획 활용
             </th>
-            <th className="w-[23.3%] px-4 py-2.5 font-medium text-teal-700">대학평가 활용</th>
+            <th className="w-[23.3%] px-4 py-2.5 font-medium text-teal-700">
+              대학기관평가인증 활용
+            </th>
+            <th className="w-[23.3%] px-4 py-2.5 font-medium text-blue-700">
+              대학혁신지원사업 활용
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +35,14 @@ export function DataMappingTable() {
                 </code>
               </td>
               <td className="px-4 py-3 text-slate-700">
+                <p>{c.ltp.indicator}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{c.ltp.task}</p>
+              </td>
+              <td className="px-4 py-3 text-slate-700">
+                <p>{c.evaluation.item}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{c.evaluation.area}</p>
+              </td>
+              <td className="px-4 py-3 text-slate-700">
                 {c.uisp ? (
                   <>
                     <p>{c.uisp.indicator}</p>
@@ -43,14 +53,6 @@ export function DataMappingTable() {
                 ) : (
                   <p className="text-xs text-slate-300">UISP 미연계</p>
                 )}
-              </td>
-              <td className="px-4 py-3 text-slate-700">
-                <p>{c.ltp.indicator}</p>
-                <p className="mt-0.5 text-xs text-slate-400">{c.ltp.task}</p>
-              </td>
-              <td className="px-4 py-3 text-slate-700">
-                <p>{c.evaluation.item}</p>
-                <p className="mt-0.5 text-xs text-slate-400">{c.evaluation.area}</p>
               </td>
             </tr>
           ))}
